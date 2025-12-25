@@ -1,0 +1,4481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广交会绿色环保展位自助平台 - MVP原型</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #fff !important;
+        }
+
+        .nav-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #27ae60;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 8px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .lang-toggle {
+            display: flex;
+            gap: 8px;
+            margin-left: 20px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #2c3e50;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .en { display: none; }
+        .en.show { display: inline; }
+        .zh { display: inline; }
+        .zh.hide { display: none; }
+
+        .process-container {
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .step-number.active {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+            box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+        }
+
+        .step-number.completed {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            color: #666;
+        }
+
+        .step-label.active {
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-left: 4px solid #27ae60;
+            padding-left: 15px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .template-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: #f9f9f9;
+        }
+
+        .template-card:hover {
+            border-color: #27ae60;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .template-card.selected {
+            border-color: #27ae60;
+            background: #e8f8f5;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .template-image {
+            width: 100%;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .template-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .template-spec {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .sample-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .sample-card {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sample-card:hover { border-color: #27ae60; box-shadow: 0 4px 12px rgba(39,174,96,0.2); }
+        .sample-card.selected { border-color: #27ae60; }
+
+        .sample-thumb {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #eee;
+        }
+
+        .sample-meta { padding: 10px 12px; font-size: 12px; color: #7f8c8d; }
+        .sample-title { font-weight: 600; color: #2c3e50; font-size: 14px; }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+
+        .compliance-alert {
+            margin: 16px 0;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .compliance-alert.success {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            color: #27ae60;
+        }
+
+        .compliance-alert.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff9800;
+            color: #856404;
+        }
+
+        .compliance-alert.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .compliance-alert .icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .compliance-report {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .quote-table th {
+            background: #ecf0f1;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            font-size: 13px;
+        }
+
+        .quote-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        .quote-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .quote-summary {
+            background: #e8f8f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #27ae60;
+            padding-top: 12px;
+            margin-top: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #27ae60;
+        }
+
+        .summary-label {
+            color: #7f8c8d;
+        }
+
+        .summary-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .order-summary {
+            background: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .order-summary h5 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            font-size: 13px;
+        }
+
+        .order-info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .order-info-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .order-info-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .btn-custom {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-primary-custom {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            background: #229954;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary-custom {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #d5dbdd;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .success-message {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            color: #27ae60;
+            margin: 20px 0;
+        }
+
+        .success-message h4 {
+            margin-bottom: 10px;
+            color: #229954;
+        }
+
+        .success-message .order-id {
+            font-family: monospace;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .material-list {
+            margin: 20px 0;
+        }
+
+        .material-item {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-left: 3px solid #27ae60;
+        }
+
+        .material-info {
+            flex: 1;
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .material-spec {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .material-qty {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .toggle-section {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        .toggle-section:hover {
+            background: #eee;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.open {
+            transform: rotate(180deg);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* 个性化与AI预览 */
+        .custom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .custom-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .custom-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .preview-canvas {
+            width: 100%;
+            height: 180px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .artifact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .artifact-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e0e0e0;
+            border-top: 2px solid #27ae60;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar-custom {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60 0%, #2ecc71 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .feature-badge {
+            display: inline-block;
+            background: #e8f8f5;
+            color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .process-container {
+                margin: 20px;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+
+            .template-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .order-info {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .step-label {
+                font-size: 11px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease;
+        }
+
+        /* 图片预览浮窗样式 */
+        .image-preview-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .image-preview-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-preview-content {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            max-width: 85vw;
+            max-height: 90vh;
+            width: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: zoomIn 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: calc(90vh - 50px);
+            width: auto;
+            height: auto;
+            display: block;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .image-preview-caption {
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+            background: white;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .image-preview-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            font-size: 28px;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .image-preview-close:hover {
+            background: white;
+            color: #e74c3c;
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #95a5a6;
+            cursor: pointer;
+            padding: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #27ae60;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-section-title i {
+            margin-right: 8px;
+        }
+
+        .optional-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .optional-card {
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: #f9f9f9;
+        }
+
+        .optional-card:hover {
+            border-color: #27ae60;
+            background: #e8f8f5;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
+        }
+
+        .optional-card.selected {
+            border-color: #27ae60;
+            background: #d5efda;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+        }
+
+        .optional-card-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .optional-card-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .optional-card-price {
+            font-size: 12px;
+            color: #27ae60;
+            font-weight: 700;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .modal-footer button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-footer .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+
+        .modal-footer .btn-primary:hover {
+            background: #229954;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+        }
+
+        .modal-footer .btn-cancel {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .modal-footer .btn-cancel:hover {
+            background: #d5d8dc;
+        }
+
+        /* AI Assistant Styles */
+        .ai-assistant {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-left: 4px solid #7c3aed;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .ai-assistant.show {
+            display: block;
+        }
+
+        .ai-assistant-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: #7c3aed;
+            font-size: 14px;
+        }
+
+        .ai-assistant-header i {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        /* 隐藏旧的AI助理对话功能，统一使用右侧悬浮面板 */
+        .ai-assistant-header .ai-action-btn,
+        .ai-chat-container,
+        .ai-input-container,
+        .ai-quick-actions {
+            display: none !important;
+        }
+
+        .ai-chat-container {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .ai-message {
+            margin-bottom: 12px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .ai-message.user {
+            text-align: right;
+        }
+
+        .ai-message-content {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 80%;
+        }
+
+        .ai-message.assistant .ai-message-content {
+            background: #f0f0f0;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-message.user .ai-message-content {
+            background: #7c3aed;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message-avatar {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #7c3aed;
+            color: white;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .ai-message.user .ai-message-avatar {
+            background: #27ae60;
+            margin-right: 0;
+            margin-left: 8px;
+        }
+
+        .ai-input-container {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .ai-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .ai-input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .ai-send-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .ai-send-btn:hover {
+            background: #6d28d9;
+            transform: scale(1.05);
+        }
+
+        .ai-send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-quick-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .ai-quick-btn {
+            background: white;
+            border: 1px solid #7c3aed;
+            color: #7c3aed;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ai-quick-btn:hover {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .ai-assistant-content {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .ai-checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ai-checklist li {
+            padding: 6px 0;
+            padding-left: 24px;
+            position: relative;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .ai-checklist li::before {
+            content: '▢';
+            position: absolute;
+            left: 0;
+            color: #999;
+            font-weight: bold;
+        }
+
+        .ai-checklist li.completed::before {
+            content: '✓';
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .ai-checklist li.completed {
+            color: #27ae60;
+        }
+
+        .ai-action-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+
+        .ai-action-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .ai-preview-section {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .ai-preview-image {
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            margin-top: 8px;
+        }
+
+        .ai-typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .ai-typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .ai-typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 右侧悬浮聊天面板 - 改为嵌入式 */
+        .chat-toggle-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 16px;
+        }
+
+        .chat-toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .chat-toggle-btn i {
+            font-size: 16px;
+        }
+
+        /* 隐藏原来的悬浮按钮 */
+        .floating-chat-toggle {
+            display: none !important;
+        }
+
+        .embedded-chat-panel {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            /* Avoid clipping/stacking issues that can hide the chat column */
+            overflow: visible;
+            display: none;
+            animation: slideIn 0.4s ease;
+            position: relative;
+            z-index: 5;
+        }
+
+        .embedded-chat-panel.active {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 0;
+            min-height: 600px;
+            max-height: 70vh;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 左侧主内容区域 */
+        .chat-main-content {
+            padding: 30px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .chat-info-card h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-info-card p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        .chat-info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .chat-info-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .chat-info-list li i {
+            color: #7c3aed;
+            font-size: 16px;
+        }
+
+        /* 右侧聊天面板 */
+        .floating-chat-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 600px;
+            border-left: 1px solid #e5e7eb;
+            position: relative;
+            z-index: 10;
+            background: white;
+            /* Keep chat visible and above any left content stacking contexts */
+            align-self: start;
+            position: sticky;
+            top: 84px;
+        }
+
+        .floating-chat-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .floating-chat-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .floating-chat-header .step-info {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .floating-chat-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+
+        .floating-chat-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .floating-chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            position: relative;
+            z-index: 10;
+        }
+
+        .floating-chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .floating-chat-message {
+            display: flex;
+            gap: 12px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .floating-chat-message.user {
+            flex-direction: row-reverse;
+        }
+
+        .floating-message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .floating-chat-message.assistant .floating-message-avatar {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+        }
+
+        .floating-chat-message.user .floating-message-avatar {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .floating-message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .floating-chat-message.assistant .floating-message-content {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .floating-chat-message.user .floating-message-content {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+
+        .floating-chat-footer {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            position: relative;
+            z-index: 20;
+        }
+
+        .floating-chat-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        .floating-chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 20;
+        }
+
+        .floating-chat-input:focus {
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+
+        .floating-chat-send {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+
+        .floating-chat-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+        }
+
+        .floating-chat-send:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .floating-quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .floating-quick-btn {
+            background: white;
+            border: 1px solid #7c3aed;
+            color: #7c3aed;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            position: relative;
+            z-index: 20;
+        }
+
+        .floating-quick-btn:hover {
+            background: #7c3aed;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .floating-typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .floating-typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #7c3aed;
+            animation: typing 1.4s infinite;
+        }
+
+        .floating-typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .floating-typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 968px) {
+            .embedded-chat-panel.active {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 500px;
+            }
+
+            .chat-main-content {
+                max-height: 400px;
+            }
+
+            .floating-chat-panel {
+                border-left: none;
+                border-top: 1px solid #e5e7eb;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .floating-chat-toggle {
+                right: 20px;
+                bottom: 20px;
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+            }
+
+            .chat-toggle-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .embedded-chat-panel.active {
+                min-height: auto;
+            }
+        }
+
+        /* 登录页面样式 */
+        .login-container {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            margin: auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 90%;
+            display: flex;
+        }
+
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 60px 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .login-left .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .login-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .login-features li {
+            padding: 12px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-features li i {
+            color: #27ae60;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .login-right {
+            flex: 1;
+            padding: 60px 40px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .login-form {
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .form-group-login {
+            margin-bottom: 24px;
+        }
+
+        .form-group-login label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-group-login input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-group-login input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            background: #fee;
+            color: #c33;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #c33;
+        }
+
+        .login-error.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .login-footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .demo-info {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .demo-info strong {
+            color: #667eea;
+        }
+
+        /* 角色选择样式 */
+        .role-selection {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            background: white;
+        }
+
+        .role-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .role-option input[type="radio"] {
+            display: none;
+        }
+
+        .role-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .role-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #667eea;
+        }
+
+        .role-option.selected .role-icon {
+            animation: bounceIn 0.5s;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .role-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .role-desc {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        .main-app {
+            display: none;
+        }
+
+        .main-app.show {
+            display: block;
+        }
+
+        /* 用户信息显示 */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: 20px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .role-badge {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            color: white;
+            font-weight: 600;
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .role-badge.contractor {
+            background: rgba(52, 152, 219, 0.3);
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .login-box {
+                flex-direction: column;
+            }
+            
+            .login-left {
+                padding: 40px 30px;
+            }
+            
+            .login-right {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录页面 -->
+    <div class="login-container" id="login-page">
+        <div class="login-box">
+            <div class="login-left">
+                <h1>
+                    <span class="zh">广交会绿色环保展位<br>自助平台</span>
+                    <span class="en">Canton Fair<br>Green Booth Platform</span>
+                </h1>
+                <p class="subtitle">
+                    <span class="zh">智能化展位搭建解决方案</span>
+                    <span class="en">Intelligent Booth Solution</span>
+                </p>
+                <ul class="login-features">
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="zh">AI 智能推荐展位模板</span>
+                        <span class="en">AI-powered booth recommendations</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="zh">自动化合规校验</span>
+                        <span class="en">Automated compliance check</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="zh">实时报价与 BOM</span>
+                        <span class="en">Real-time quote & BOM</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="zh">绿色环保可复用设计</span>
+                        <span class="en">Eco-friendly reusable design</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="login-right">
+                <div class="login-header">
+                    <h2>
+                        <span class="zh">参展商登录</span>
+                        <span class="en">Exhibitor Login</span>
+                    </h2>
+                    <p>
+                        <span class="zh">登录后开始您的智能展位定制之旅</span>
+                        <span class="en">Start your smart booth customization journey</span>
+                    </p>
+                </div>
+
+                <div class="login-form">
+                    <div class="login-error" id="login-error">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span class="zh">用户名或密码错误</span>
+                        <span class="en">Invalid username or password</span>
+                    </div>
+
+                    <form onsubmit="handleLogin(event)">
+                        <!-- 角色选择 -->
+                        <div class="form-group-login">
+                            <label style="margin-bottom: 12px;">
+                                <i class="bi bi-person-badge"></i>
+                                <span class="zh">选择角色</span>
+                                <span class="en">Select Role</span>
+                            </label>
+                            <div class="role-selection">
+                                <label class="role-option selected" id="role-exhibitor">
+                                    <input type="radio" name="role" value="exhibitor" checked onchange="selectRole('exhibitor')">
+                                    <div class="role-icon">🏢</div>
+                                    <div class="role-label">
+                                        <span class="zh">参展商</span>
+                                        <span class="en">Exhibitor</span>
+                                    </div>
+                                    <div class="role-desc">
+                                        <span class="zh">展位需求方</span>
+                                        <span class="en">Booth demander</span>
+                                    </div>
+                                </label>
+                                <label class="role-option" id="role-contractor">
+                                    <input type="radio" name="role" value="contractor" onchange="selectRole('contractor')">
+                                    <div class="role-icon">🏗️</div>
+                                    <div class="role-label">
+                                        <span class="zh">布展公司</span>
+                                        <span class="en">Contractor</span>
+                                    </div>
+                                    <div class="role-desc">
+                                        <span class="zh">展位搭建方</span>
+                                        <span class="en">Booth builder</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group-login">
+                            <label>
+                                <i class="bi bi-person"></i>
+                                <span class="zh">用户名</span>
+                                <span class="en">Username</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                placeholder="Demo"
+                                value="Demo"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group-login">
+                            <label>
+                                <i class="bi bi-lock"></i>
+                                <span class="zh">密码</span>
+                                <span class="en">Password</span>
+                            </label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                placeholder="••••••"
+                                value="Demo_123"
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" class="login-btn">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span class="zh">登录</span>
+                            <span class="en">Login</span>
+                        </button>
+                    </form>
+
+                    <div class="demo-info">
+                        <i class="bi bi-info-circle"></i>
+                        <span class="zh"><strong>演示账号：</strong>用户名: Demo / 密码: Demo_123</span>
+                        <span class="en"><strong>Demo Account:</strong> Username: Demo / Password: Demo_123</span>
+                    </div>
+
+                    <div class="login-footer">
+                        <span class="zh">© 2026 广交会绿色环保展位平台 - MVP 原型</span>
+                        <span class="en">© 2026 Canton Fair Green Booth Platform - MVP Prototype</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主应用（登录后显示） -->
+    <div class="main-app" id="main-app">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <span class="nav-icon">♻</span> <span class="zh">广交会绿色环保展位自助平台</span><span class="en show">Canton Fair Green Booth Platform</span>
+            </span>
+            <div class="ms-auto" style="display: flex; align-items: center;">
+                <div class="lang-toggle">
+                    <button class="lang-btn active" id="lang-zh" onclick="setLanguage('zh')">中文</button>
+                    <button class="lang-btn" id="lang-en" onclick="setLanguage('en')">English</button>
+                </div>
+                
+                <!-- Chat AI 按钮 -->
+                <button class="chat-toggle-btn" onclick="toggleEmbeddedChat()">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span class="zh">Chat AI</span>
+                    <span class="en">Chat AI</span>
+                </button>
+                
+                <span style="color: white; font-size: 13px; margin-left: 20px;"><span class="zh">参展商端</span><span class="en show">Exhibitor Portal</span></span>
+                
+                <!-- 用户信息 -->
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">D</div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <span class="user-name" id="user-name">Demo</span>
+                        <span class="role-badge" id="role-badge">
+                            <span>🏢</span>
+                            <span class="zh">参展商</span>
+                            <span class="en">Exhibitor</span>
+                        </span>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="zh">退出</span>
+                        <span class="en">Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="process-container">
+        <!-- 嵌入式聊天面板 -->
+        <div class="embedded-chat-panel" id="embedded-chat-panel">
+            <!-- 左侧主内容区域 -->
+            <div class="chat-main-content">
+                <div class="chat-info-card">
+                    <h4>
+                        <i class="bi bi-lightbulb-fill" style="color: #f39c12;"></i>
+                        <span class="zh">AI 助理能为您做什么？</span>
+                        <span class="en">What can AI Assistant do for you?</span>
+                    </h4>
+                    <p>
+                        <span class="zh">我是您的智能展位顾问，可以帮助您完成整个展位定制流程。无论是选择模板、了解合规要求，还是分析报价，我都能为您提供专业建议。</span>
+                        <span class="en">I'm your intelligent booth consultant, helping you through the entire booth customization process. Whether choosing templates, understanding compliance, or analyzing quotes, I provide professional advice.</span>
+                    </p>
+                </div>
+
+                <div class="chat-info-card">
+                    <h4>
+                        <i class="bi bi-stars" style="color: #7c3aed;"></i>
+                        <span class="zh">核心功能</span>
+                        <span class="en">Core Features</span>
+                    </h4>
+                    <ul class="chat-info-list">
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span class="zh">智能推荐展位模板，根据您的需求匹配最佳方案</span>
+                            <span class="en">Smart booth template recommendations based on your needs</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span class="zh">实时解答合规问题，确保展位符合广交会标准</span>
+                            <span class="en">Real-time compliance Q&A, ensuring Canton Fair standards</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span class="zh">详细报价分析，帮助您了解每一项费用</span>
+                            <span class="en">Detailed quote analysis for every cost item</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span class="zh">环保方案咨询，提供可持续发展建议</span>
+                            <span class="en">Eco-friendly solutions and sustainability advice</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="chat-info-card">
+                    <h4>
+                        <i class="bi bi-question-circle-fill" style="color: #27ae60;"></i>
+                        <span class="zh">常见问题示例</span>
+                        <span class="en">Common Questions</span>
+                    </h4>
+                    <ul class="chat-info-list">
+                        <li>
+                            <i class="bi bi-chat-quote"></i>
+                            <span class="zh">"如何选择适合我的展位尺寸？"</span>
+                            <span class="en">"How to choose the right booth size?"</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-chat-quote"></i>
+                            <span class="zh">"什么是可复用率？对我有什么好处？"</span>
+                            <span class="en">"What is reusability rate and its benefits?"</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-chat-quote"></i>
+                            <span class="zh">"不同模板的价格差异在哪里？"</span>
+                            <span class="en">"What are the price differences between templates?"</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-chat-quote"></i>
+                            <span class="zh">"展位搭建需要多长时间？"</span>
+                            <span class="en">"How long does booth construction take?"</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                    <i class="bi bi-arrow-right-circle" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    <p style="margin: 0; font-size: 14px; opacity: 0.95;">
+                        <span class="zh">👉 在右侧聊天窗口开始对话，随时向我提问</span>
+                        <span class="en">👉 Start chatting in the right panel, ask me anytime</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- 右侧聊天面板 -->
+            <div class="floating-chat-panel">
+                <div class="floating-chat-header">
+                    <div>
+                        <h3><i class="bi bi-robot"></i> <span class="zh">AI 对话</span><span class="en">AI Chat</span></h3>
+                        <div class="step-info" id="chat-step-info">
+                            <span class="zh">第1步：选择展位模板</span><span class="en">Step 1: Select Booth Template</span>
+                        </div>
+                    </div>
+                    <button class="floating-chat-close" onclick="toggleEmbeddedChat()">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+
+                <div class="floating-chat-body" id="floating-chat-body">
+                    <div class="floating-chat-messages" id="floating-chat-messages">
+                        <!-- 欢迎消息 -->
+                        <div class="floating-chat-message assistant">
+                            <div class="floating-message-avatar">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div class="floating-message-content">
+                                <span class="zh">👋 欢迎使用广交会绿色环保展位自助平台！我是您的AI助理。<br><br>我可以帮您：<br>• 了解不同模板的特点<br>• 比较价格和性价比<br>• 选择合适的尺寸<br>• 解释可复用率的意义<br><br>请随时向我提问！</span>
+                                <span class="en">👋 Welcome to Canton Fair Green Booth Platform! I'm your AI assistant.<br><br>I can help with:<br>• Understanding template features<br>• Comparing prices and value<br>• Selecting the right size<br>• Explaining reusability<br><br>Feel free to ask!</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 输入提示 -->
+                    <div id="floating-typing" style="display: none;">
+                        <div class="floating-chat-message assistant">
+                            <div class="floating-message-avatar">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div class="floating-message-content">
+                                <div class="floating-typing-indicator">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="floating-chat-footer">
+                    <!-- 快捷操作按钮 -->
+                    <div class="floating-quick-actions" id="floating-quick-actions">
+                        <button class="floating-quick-btn" onclick="sendFloatingQuickMessage('介绍一下简洁绿色展位')">
+                            <span class="zh">介绍简洁绿色展位</span><span class="en">About Green Booth</span>
+                        </button>
+                        <button class="floating-quick-btn" onclick="sendFloatingQuickMessage('如何选择合适的尺寸？')">
+                            <span class="zh">如何选尺寸？</span><span class="en">Size Guide</span>
+                        </button>
+                        <button class="floating-quick-btn" onclick="sendFloatingQuickMessage('可复用率是什么意思？')">
+                            <span class="zh">可复用率？</span><span class="en">Reusability?</span>
+                        </button>
+                    </div>
+                    
+                    <div class="floating-chat-input-wrapper">
+                        <input 
+                            type="text" 
+                            class="floating-chat-input" 
+                            id="floating-chat-input"
+                            placeholder="输入您的问题..."
+                            onkeypress="if(event.key==='Enter') sendFloatingMessage()"
+                        />
+                        <button class="floating-chat-send" onclick="sendFloatingMessage()" id="floating-send-btn">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 流程指示器 -->
+        <div class="step-indicator">
+            <div class="step-item">
+                <div class="step-number active" onclick="goToStep(1)">1</div>
+                <div class="step-label active">选择模板</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number" onclick="goToStep(2)" id="step-2">2</div>
+                <div class="step-label">合规校验</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number" onclick="goToStep(3)" id="step-3">3</div>
+                <div class="step-label">获取报价</div>
+            </div>
+            <div class="step-item">
+                <div class="step-number" onclick="goToStep(4)" id="step-4">4</div>
+                <div class="step-label">确认下单</div>
+            </div>
+        </div>
+
+        <!-- 第一步：选择模板 -->
+        <div id="step-1-content" class="content-card">
+            <div class="section-title"><i class="bi bi-bookmark"></i> <span class="zh">步骤 1：选择展位模板</span><span class="en show">Step 1: Select Booth Template</span></div>
+
+            <div class="toggle-section" onclick="toggleSection('gallery-section')">
+                <div><strong><span class="zh">方案库素材预览</span><span class="en show">Template Gallery Preview</span></strong><br><small><span class="zh">来自绿色环保方案库：现场照、施工图、品牌替换示例</span><span class="en show">From the Green Booth Library: On-site photos, construction drawings, brand replacement examples</span></small></div>
+                <div class="toggle-icon" id="gallery-toggle">▼</div>
+            </div>
+            <div id="gallery-section" class="hidden">
+                <div class="template-grid">
+                    <div class="template-card">
+                        <img id="gallery-site" class="template-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png" alt="现场/完工照" onclick="previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png', '方案一：搭建完毕现场照')">
+                        <div class="template-title">现场/完工照</div>
+                        <div class="template-spec">来自方案库（示例）<br><small style="color: #7c3aed;">💡 点击放大查看</small></div>
+                    </div>
+                    <div class="template-card">
+                        <img id="gallery-drawing" class="template-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/施工图.png" alt="施工图" onclick="previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/施工图.png', '方案一：施工图')">
+                        <div class="template-title">施工图</div>
+                        <div class="template-spec">结构与尺寸参考<br><small style="color: #7c3aed;">💡 点击放大查看</small></div>
+                    </div>
+                    <div class="template-card">
+                        <img id="gallery-logo" class="template-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/替换展商logo效果图.png" alt="Logo替换效果图" onclick="previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/替换展商logo效果图.png', '方案一：替换展商Logo效果图')">
+                        <div class="template-title">Logo替换效果</div>
+                        <div class="template-spec">品牌个性化示例<br><small style="color: #7c3aed;">💡 点击放大查看</small></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>展位尺寸</label>
+                <select class="form-control" id="template-size">
+                    <option value="">-- 请选择 --</option>
+                    <option value="3x3">3m × 3m（9㎡）</option>
+                    <option value="6x3">6m × 3m（18㎡）</option>
+                    <option value="6x6">6m × 6m（36㎡）</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>展示风格</label>
+                <select class="form-control" id="template-style">
+                    <option value="">-- 请选择 --</option>
+                    <option value="modern">现代简约</option>
+                    <option value="nature">自然环保</option>
+                    <option value="tech">科技感</option>
+                </select>
+            </div>
+
+            <div class="section-title" style="margin-top: 30px; border-left: 4px solid #27ae60;"><span class="zh">绿色环保方案库</span><span class="en show">Green Solution Library</span></div>
+            <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 15px;"><span class="zh">💡 提示：点击任意方案卡片可查看详情和可选服务</span><span class="en show">💡 Tip: Click any booth template to view details and optional add-ons</span></p>
+            <div class="template-grid">
+                <div class="template-card" onclick="selectTemplate(this, 'T001', '简洁绿色展位'); openModal('T001')">
+                    <img class="template-image" id="template-image-1" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png', '方案一：简洁绿色展位 - 对外效果图')">
+                    <div class="template-title">简洁绿色展位</div>
+                    <div class="template-spec">
+                        <div>尺寸: 6m × 3m</div>
+                        <div>材料: 铝合金框架</div>
+                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 92%</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate(this, 'T002', '生态互动展位'); openModal('T002')">
+                    <img class="template-image" id="template-image-2" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png', '方案二：生态互动展位 - 对外效果图')">
+                    <div class="template-title">生态互动展位</div>
+                    <div class="template-spec">
+                        <div>尺寸: 6m × 6m</div>
+                        <div>材料: 木质框架</div>
+                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 88%</div>
+                    </div>
+                </div>
+
+                <div class="template-card" onclick="selectTemplate(this, 'T003', '高端品牌展位'); openModal('T003')">
+                    <div class="template-image"><i class="bi bi-image" style="font-size: 32px; color: #bbb;"></i></div>
+                    <div class="template-title">高端品牌展位</div>
+                    <div class="template-spec">
+                        <div>尺寸: 6m × 6m</div>
+                        <div>材料: 铝合金+木质</div>
+                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 85%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 个性化与AI生成预览 -->
+            <div class="toggle-section" onclick="toggleSection('custom-section')" style="margin-top: 20px;">
+                <div><strong><span class="zh">个性化与AI生成预览</span><span class="en show">Customization & AI Preview</span></strong><br><small><span class="zh">选择颜色 / 上传Logo / 输入自然语言，自动生成效果图（多角度）</span><span class="en show">Choose colors / Upload logo / Enter natural language to auto-generate renderings (multiple angles)</span></small></div>
+                <div class="toggle-icon" id="custom-toggle">▼</div>
+            </div>
+            <div id="custom-section" class="hidden">
+                <div class="custom-grid">
+                    <div class="custom-card">
+                        <div class="custom-title">品牌主色</div>
+                        <input type="color" id="color-primary" value="#27ae60" class="form-control">
+                        <div style="height:8px"></div>
+                        <div class="custom-title">品牌次色</div>
+                        <input type="color" id="color-secondary" value="#2c3e50" class="form-control">
+                    </div>
+                    <div class="custom-card">
+                        <div class="custom-title">Logo上传</div>
+                        <input type="file" id="logo-upload" accept="image/*" class="form-control">
+                        <div style="height:8px"></div>
+                        <div class="custom-title">Logo位置</div>
+                        <select id="logo-position" class="form-control">
+                            <option value="center">居中</option>
+                            <option value="top-left">左上</option>
+                            <option value="top-right">右上</option>
+                            <option value="bottom-left">左下</option>
+                            <option value="bottom-right">右下</option>
+                        </select>
+                    </div>
+                    <div class="custom-card" style="grid-column: span 2;">
+                        <div class="custom-title">自然语言调整（例如：主色偏绿色，整体更明亮，Logo居中）</div>
+                        <textarea id="prompt-text" rows="3" class="form-control" placeholder="请输入对效果图的期望描述"></textarea>
+                        <div class="button-group" style="justify-content:flex-start;">
+                            <button class="btn-custom btn-primary-custom" onclick="applyCustomization()">
+                                <i class="bi bi-magic"></i> <span class="zh">AI生成预览</span><span class="en show">AI Generate</span>
+                            </button>
+                            <button class="btn-custom btn-secondary-custom" onclick="saveSnapshot()">
+                                <i class="bi bi-save"></i> <span class="zh">保存当前预览</span><span class="en show">Save Preview</span>
+                            </button>
+                            <button class="btn-custom btn-secondary-custom" onclick="exportAdjustments()">
+                                <i class="bi bi-file-earmark-arrow-down"></i> <span class="zh">导出调整记录</span><span class="en show">Export Log</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template-grid" style="margin-top: 12px;">
+                    <div class="template-card">
+                        <div class="template-title">正面预览</div>
+                        <canvas id="preview-front" class="preview-canvas"></canvas>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-title">左前角预览</div>
+                        <canvas id="preview-left" class="preview-canvas"></canvas>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-title">右前角预览</div>
+                        <canvas id="preview-right" class="preview-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI输出效果图 -->
+                <div id="ai-output-section" style="display: none; margin-top: 20px;">
+                    <div class="section-title" style="font-size:16px; border:none; padding:0; margin-bottom: 12px;">🤖 <span class="zh">AI生成效果（替换展商Logo）</span><span class="en show">AI Generated Result (Logo Replaced)</span></div>
+                    <div style="background: white; border-radius: 8px; padding: 12px; border: 2px solid #7c3aed;">
+                        <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+                            <span class="zh">AI已为您生成了替换展商Logo后的展位效果预览。这是基于您选择的模板和自定义参数的专业效果图：</span>
+                            <span class="en show">AI has generated a booth preview with your logo. This is based on your selected template and customization parameters:</span>
+                        </p>
+                        <img id="ai-output-image" class="ai-preview-image clickable-image" src="" alt="AI效果图" onclick="previewImage(this.src, 'AI生成效果图 - 替换展商Logo')">
+                        <div style="margin-top: 8px; font-size: 11px; color: #999; text-align: center;">
+                            <span class="zh">💡 提示：点击图片可放大查看详情</span>
+                            <span class="en show">💡 Tip: This is an intelligent preview based on your selected scheme and configuration</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 20px; font-size:16px; border:none; padding:0;">📁 生成的成果物</div>
+                <div id="artifact-list" class="artifact-grid"></div>
+            </div>
+
+            <!-- Step 1 AI助理 -->
+            <div class="ai-assistant" id="step1-ai-assistant">
+                <div class="ai-assistant-header">
+                    <div>
+                        <i class="bi bi-robot"></i> <span class="zh">AI助理：模板选择指南</span><span class="en show">AI Assistant: Template Selection Guide</span>
+                    </div>
+                    <button class="ai-action-btn" onclick="toggleAIChat('step1')" style="margin: 0;">
+                        <i class="bi bi-chat-dots"></i> <span class="zh">对话</span><span class="en show">Chat</span>
+                    </button>
+                </div>
+                
+                <!-- AI Chat Container -->
+                <div id="step1-chat" class="ai-chat-container" style="display: none;">
+                    <div id="step1-messages"></div>
+                    <div id="step1-typing" style="display: none;">
+                        <div class="ai-typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-input-container" id="step1-input" style="display: none;">
+                    <input type="text" class="ai-input" id="step1-input-field" placeholder="输入您的问题，例如：如何选择合适的模板？" />
+                    <button class="ai-send-btn" onclick="sendAIMessage('step1')">
+                        <i class="bi bi-send"></i> <span class="zh">发送</span><span class="en show">Send</span>
+                    </button>
+                </div>
+                
+                <div class="ai-quick-actions" id="step1-quick" style="display: none;">
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step1', '如何选择合适的模板？')">如何选择模板？</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step1', '什么是可复用率？')">可复用率是什么？</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step1', '我想看AI生成的效果图')">查看AI效果图</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step1', '不同尺寸的价格差异？')">价格差异？</button>
+                </div>
+                
+                <div class="ai-assistant-content" id="step1-summary">
+                    <span class="zh">
+                        👋 欢迎使用广交会绿色环保展位自助平台！我是您的AI助理。
+                        <br>点击上方"对话"按钮，随时向我提问。
+                    </span>
+                    <span class="en show">
+                        👋 Welcome to the Canton Fair Green Booth Self-Service Platform! I'm your AI assistant.
+                        <br>Click "Chat" button above to ask me anything.
+                    </span>
+                </div>
+                <ul class="ai-checklist">
+                    <li id="check-template"><span class="zh">已选择模板</span><span class="en show">Template selected</span></li>
+                    <li id="check-size"><span class="zh">已选择尺寸</span><span class="en show">Size selected</span></li>
+                    <li id="check-style"><span class="zh">已选择展示风格</span><span class="en show">Style selected</span></li>
+                </ul>
+            </div>
+
+            </div>
+        </div>
+
+        <!-- 第二步：合规校验 -->
+        <div id="step-2-content" class="content-card hidden">
+            <div class="section-title"><i class="bi bi-check-circle"></i> 步骤 2：合规校验</div>
+            
+                <div class="compliance-alert success">
+                <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                        <strong>✓ 基础信息检查通过</strong><br>
+                        <small>模板名称: <strong id="selected-template-label">简洁绿色展位</strong> | 尺寸: <strong>6m × 3m</strong></small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>展位实际尺寸（请确认）</label>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                        <div>
+                            <label style="font-size: 12px; font-weight: normal;">长度(m)</label>
+                            <input type="number" class="form-control" value="6" step="0.1">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: normal;">宽度(m)</label>
+                        <input type="number" class="form-control" value="3" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>展位高度(m)</label>
+                <input type="number" class="form-control" value="2.5" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label>主要展示材料</label>
+                <select class="form-control">
+                    <option value="aluminum">铝合金框架</option>
+                    <option value="wood">木质框架</option>
+                    <option value="steel">钢铁框架</option>
+                </select>
+            </div>
+
+            <button class="btn-custom btn-secondary-custom" style="width: 100%; margin-bottom: 20px;" onclick="runCompliance()">
+                <i class="bi bi-play-circle"></i> 立即校验
+            </button>
+
+            <div id="compliance-results" class="hidden">
+                <div class="compliance-alert success">
+                    <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <strong>✓ 尺寸校验通过</strong><br>
+                        <small>展位尺寸符合广交会规范 (6m ≤ 18m，高度 2.5m ≤ 3.2m)</small>
+                    </div>
+                </div>
+
+                <div class="compliance-alert success">
+                    <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <strong>✓ 材料合规</strong><br>
+                        <small>铝合金框架符合安全标准，可回收率≥80%</small>
+                    </div>
+                </div>
+
+                <div class="compliance-alert warning">
+                    <div class="icon"><i class="bi bi-exclamation-circle-fill"></i></div>
+                    <div>
+                        <strong>⚠ 消防疏散</strong><br>
+                        <small>建议：确保展位内疏散通道宽度 ≥1.2m。<strong>预案：调整展品布置方案</strong></small>
+                    </div>
+                </div>
+
+                <div class="compliance-alert success">
+                    <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <div>
+                        <strong>✓ 重心稳定性</strong><br>
+                        <small>展位结构稳定，可承载最大负荷 150kg/㎡</small>
+                    </div>
+                </div>
+
+                <div class="progress-bar-custom">
+                    <div class="progress-fill" style="width: 92%;"></div>
+                </div>
+                <div style="text-align: center; font-weight: 600; color: #27ae60; margin-top: 8px;">合规通过率: 92% <span class="feature-badge">可进行下一步</span></div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-custom btn-secondary-custom" onclick="goToStep(1)">← 上一步</button>
+                <button class="btn-custom btn-primary-custom" onclick="goToStep(3)">下一步：获取报价 →</button>
+            </div>
+
+            <!-- Step 2 AI助理 -->
+            <div class="ai-assistant show" id="step2-ai-assistant" style="margin-top: 30px;">
+                <div class="ai-assistant-header">
+                    <div>
+                        <i class="bi bi-shield-check"></i> <span class="zh">AI助理：合规校验指南</span><span class="en show">AI Assistant: Compliance Guide</span>
+                    </div>
+                    <button class="ai-action-btn" onclick="toggleAIChat('step2')" style="margin: 0;">
+                        <i class="bi bi-chat-dots"></i> <span class="zh">对话</span><span class="en show">Chat</span>
+                    </button>
+                </div>
+                
+                <!-- AI Chat Container -->
+                <div id="step2-chat" class="ai-chat-container" style="display: none;">
+                    <div id="step2-messages"></div>
+                    <div id="step2-typing" style="display: none;">
+                        <div class="ai-typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-input-container" id="step2-input" style="display: none;">
+                    <input type="text" class="ai-input" id="step2-input-field" placeholder="输入您的问题，例如：消防要求是什么？" />
+                    <button class="ai-send-btn" onclick="sendAIMessage('step2')">
+                        <i class="bi bi-send"></i> <span class="zh">发送</span><span class="en show">Send</span>
+                    </button>
+                </div>
+                
+                <div class="ai-quick-actions" id="step2-quick" style="display: none;">
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step2', '合规不通过怎么办？')">如何解决合规问题？</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step2', '消防要求有哪些？')">消防要求</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step2', '材料需要环保认证吗？')">材料认证</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step2', '疏散通道宽度标准？')">疏散通道</button>
+                </div>
+                
+                <div class="ai-assistant-content" id="step2-summary">
+                    <span class="zh">
+                        🔍 我已经完成了对您展位方案的专业合规审核。广交会对所有展位有严格的安全和环保标准。
+                    </span>
+                    <span class="en show">
+                        🔍 I have completed a professional compliance review of your booth design.
+                    </span>
+                </div>
+                <ul class="ai-checklist">
+                    <li class="completed"><span class="zh">✓ 尺寸校验通过</span><span class="en show">✓ Size compliant</span></li>
+                    <li class="completed"><span class="zh">✓ 材料合规检查</span><span class="en show">✓ Materials approved</span></li>
+                    <li><span class="zh">⚠ 消防疏散 - 需调整</span><span class="en show">⚠ Fire safety - Action needed</span></li>
+                    <li class="completed"><span class="zh">✓ 结构稳定性</span><span class="en show">✓ Structure stable</span></li>
+                </ul>
+                <div style="margin-top: 12px; padding: 10px; background: #fff9e6; border-radius: 6px; font-size: 12px; color: #666;">
+                    <span class="zh"><strong>建议：</strong> 确保展位内疏散通道宽度 ≥ 1.2m。我们可以帮您调整展品布置方案。</span>
+                    <span class="en show"><strong>Recommendation:</strong> Ensure the evacuation aisle width ≥ 1.2m. We can help adjust the display layout.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第三步：获取报价 -->
+        <div id="step-3-content" class="content-card hidden">
+            <div class="section-title"><i class="bi bi-calculator"></i> 步骤 3：获取报价</div>
+            
+            <div class="progress-bar-custom">
+                <div class="progress-fill" style="width: 100%;"></div>
+            </div>
+            <div style="text-align: center; color: #27ae60; font-weight: 600; margin-bottom: 20px;">正在计算成本...</div>
+
+            <div class="section-title" style="margin-top: 30px; font-size: 16px; border: none; padding: 0;">📦 物料清单 (BOM)</div>
+
+            <div class="material-list">
+                <div class="material-item">
+                    <div class="material-info">
+                        <div class="material-name">铝合金框架 (40x40mm)</div>
+                        <div class="material-spec">可复用，阻燃等级 B1</div>
+                    </div>
+                    <div class="material-qty">48m</div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-info">
+                        <div class="material-name">环保亚克力板 (3mm)</div>
+                        <div class="material-spec">白色，可定制打印</div>
+                    </div>
+                    <div class="material-qty">18㎡</div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-info">
+                        <div class="material-name">LED照明模组</div>
+                        <div class="material-spec">节能，色温可调</div>
+                    </div>
+                    <div class="material-qty">8个</div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-info">
+                        <div class="material-name">吸音棉垫</div>
+                        <div class="material-spec">环保无甲醛</div>
+                    </div>
+                    <div class="material-qty">12㎡</div>
+                </div>
+            </div>
+
+            <div class="toggle-section" onclick="toggleSection('bom-image-section')">
+                <div><strong>查看样例清单图片</strong><br><small>方案一：材料清单.png；方案二：BOM.png</small></div>
+                <div class="toggle-icon" id="bom-toggle">▼</div>
+            </div>
+            <div id="bom-image-section" class="hidden">
+                <img id="bom-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/材料清单.png" alt="样例清单" class="clickable-image" style="width:100%; border-radius:8px; border:1px solid #eee;" onclick="previewImage(this.src, '材料清单 / BOM')">
+                <p style="text-align: center; margin-top: 8px; font-size: 12px; color: #7c3aed;">💡 点击图片可放大查看详情</p>
+            </div>
+
+            <div class="section-title" style="margin-top: 30px; font-size: 16px; border: none; padding: 0;">💰 费用明细</div>
+
+            <table class="quote-table">
+                <thead>
+                    <tr>
+                        <th>费用项目</th>
+                        <th style="text-align: right;">金额 (¥)</th>
+                        <th style="text-align: right;">说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>材料费用</strong></td>
+                        <td style="text-align: right;"><strong id="cost-materials">28,500</strong></td>
+                        <td style="text-align: right; font-size: 12px;">框架、板材、配件</td>
+                    </tr>
+                    <tr>
+                        <td><strong>搭建人工费</strong></td>
+                        <td style="text-align: right;"><strong id="cost-labor">12,000</strong></td>
+                        <td style="text-align: right; font-size: 12px;">2天, 4人团队</td>
+                    </tr>
+                    <tr>
+                        <td><strong>运输配送费</strong></td>
+                        <td style="text-align: right;"><strong id="cost-logistics">3,500</strong></td>
+                        <td style="text-align: right; font-size: 12px;">往返配送</td>
+                    </tr>
+                    <tr>
+                        <td><strong>设计定制费</strong></td>
+                        <td style="text-align: right;"><strong id="cost-design">2,000</strong></td>
+                        <td style="text-align: right; font-size: 12px;">logo替换、配色调整</td>
+                    </tr>
+                    <tr>
+                        <td><strong><span class="zh">可选服务费</span><span class="en show">Optional Services</span></strong></td>
+                        <td style="text-align: right;"><strong id="cost-optionals" style="color: #e74c3c;">0</strong></td>
+                        <td style="text-align: right; font-size: 12px;"><span class="zh">配色、照明、材料升级等</span><span class="en show">Colors, lighting, materials upgrade, etc.</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" style="padding: 0;"><hr style="margin: 0; border: none; border-top: 2px solid #27ae60;"></td>
+                    </tr>
+                    <tr>
+                        <td><strong>小计</strong></td>
+                        <td style="text-align: right; color: #27ae60; font-weight: 700;"><span id="subtotal">46,000</span></td>
+                        <td style="text-align: right;"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="quote-summary">
+                <div class="summary-row">
+                    <span class="summary-label">基础价格</span>
+                    <span class="summary-value"><span id="base-price">46,000</span> ¥</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">运营服务费 (7%)</span>
+                    <span class="summary-value">+ <span id="op-fee">3,220</span> ¥</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">平台技术费 (3%)</span>
+                    <span class="summary-value">+ <span id="tech-fee">1,380</span> ¥</span>
+                </div>
+                <div class="summary-row total">
+                    <span class="summary-label">总计 (含服务)</span>
+                    <span class="summary-value"><span id="total-price">50,600</span> ¥</span>
+                </div>
+            </div>
+
+            <div style="background: #f0f8ff; border-left: 4px solid #17a2b8; padding: 12px; margin-top: 20px; border-radius: 4px; font-size: 13px;">
+                <i class="bi bi-info-circle"></i> <strong>报价有效期：7天</strong> | 含搭建、拆卸、清运 | 可选增值服务：布景设计、灯光方案等
+            </div>
+
+            <div class="button-group">
+                <button class="btn-custom btn-secondary-custom" onclick="goToStep(2)">← 上一步</button>
+                <button class="btn-custom btn-primary-custom" onclick="goToStep(4)">下一步：确认下单 →</button>
+            </div>
+
+            <!-- Step 3 AI助理 -->
+            <div class="ai-assistant show" id="step3-ai-assistant" style="margin-top: 30px;">
+                <div class="ai-assistant-header">
+                    <div>
+                        <i class="bi bi-currency-exchange"></i> <span class="zh">AI助理：报价分析</span><span class="en show">AI Assistant: Price Analysis</span>
+                    </div>
+                    <button class="ai-action-btn" onclick="toggleAIChat('step3')" style="margin: 0;">
+                        <i class="bi bi-chat-dots"></i> <span class="zh">对话</span><span class="en show">Chat</span>
+                    </button>
+                </div>
+                
+                <!-- AI Chat Container -->
+                <div id="step3-chat" class="ai-chat-container" style="display: none;">
+                    <div id="step3-messages"></div>
+                    <div id="step3-typing" style="display: none;">
+                        <div class="ai-typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-input-container" id="step3-input" style="display: none;">
+                    <input type="text" class="ai-input" id="step3-input-field" placeholder="输入您的问题，例如：为什么需要服务费？" />
+                    <button class="ai-send-btn" onclick="sendAIMessage('step3')">
+                        <i class="bi bi-send"></i> <span class="zh">发送</span><span class="en show">Send</span>
+                    </button>
+                </div>
+                
+                <div class="ai-quick-actions" id="step3-quick" style="display: none;">
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step3', '服务费是什么？')">服务费说明</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step3', '推荐什么可选服务？')">推荐增值服务</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step3', '价格可以优惠吗？')">优惠政策</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step3', '如何降低成本？')">成本优化</button>
+                </div>
+                
+                <div class="ai-assistant-content" id="step3-summary">
+                    <span class="zh">
+                        💰 根据您的选择，我为您精确计算了展位的完整报价。
+                    </span>
+                    <span class="en show">
+                        💰 Based on your selections, I have calculated a detailed price quote.
+                    </span>
+                </div>
+                <ul class="ai-checklist" style="font-size: 12px;">
+                    <li class="completed"><span class="zh">✓ 材料费用已计算</span><span class="en show">✓ Materials calculated</span></li>
+                    <li class="completed"><span class="zh">✓ 人工费已评估</span><span class="en show">✓ Labor estimated</span></li>
+                    <li class="completed"><span class="zh">✓ 配送费已确认</span><span class="en show">✓ Logistics confirmed</span></li>
+                    <li><span class="zh">💡 可选服务建议 - 提升品质</span><span class="en show">💡 Add-ons suggested - Enhance quality</span></li>
+                </ul>
+                <div style="margin-top: 12px; padding: 10px; background: #e8f5e9; border-radius: 6px; font-size: 12px; color: #666;">
+                    <span class="zh"><strong>AI建议：</strong> 根据您的品牌定位，我建议添加 \"强化LED照明\" 和 \"24小时在线支持\"，可提升展位专业度，提高访客停留时间。</span>
+                    <span class="en show"><strong>AI Suggestion:</strong> Based on your brand positioning, I recommend adding \"Enhanced LED lighting\" and \"24/7 Support\" to elevate booth professionalism and extend visitor engagement.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第四步：确认下单 -->
+        <div id="step-4-content" class="content-card hidden">
+            <div class="section-title"><i class="bi bi-receipt"></i> 步骤 4：确认订单</div>
+            
+            <div class="order-summary">
+                <h5>📋 订单摘要</h5>
+                <div class="order-info">
+                    <div class="order-info-item">
+                        <div class="order-info-label">选择模板</div>
+                        <div class="order-info-value" id="order-template-label">简洁绿色展位</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="order-info-label">展位尺寸</div>
+                        <div class="order-info-value">6m × 3m</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="order-info-label">合规状态</div>
+                        <div class="order-info-value" style="color: #27ae60;">✓ 通过 (92%)</div>
+                    </div>
+                    <div class="order-info-item">
+                        <div class="order-info-label">报价金额</div>
+                        <div class="order-info-value"><span id="order-total">50,600</span> ¥</div>
+                    </div>
+                </div>
+
+                <!-- 可选服务选择摘要 -->
+                <div id="order-optionals-summary" style="margin-top: 16px; padding: 12px; background: #e8f8f5; border-radius: 6px; border-left: 4px solid #27ae60; display: none;">
+                    <div style="font-weight: 600; color: #27ae60; margin-bottom: 10px;"><i class="bi bi-plus-circle"></i> <span class="zh">已选择的增值服务</span><span class="en show">Selected Add-ons</span></div>
+                    <ul id="order-optionals-list" style="list-style: none; padding: 0; margin: 0; font-size: 13px;">
+                        <li style="color: #666; padding: 4px 0;"><span class="zh">暂无选择</span><span class="en show">None selected</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="toggle-section" onclick="toggleSection('confirm-image-section')">
+                <div><strong>方案效果图 / 现场照</strong><br><small>用于订单确认展示</small></div>
+                <div class="toggle-icon" id="confirm-toggle">▼</div>
+            </div>
+            <div id="confirm-image-section" class="hidden">
+                <img id="confirm-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png" alt="方案效果图" class="clickable-image" style="width:100%; border-radius:8px; border:1px solid #eee;" onclick="previewImage(this.src, '方案效果图 / 现场照')">
+                <p style="text-align: center; margin-top: 8px; font-size: 12px; color: #7c3aed;">💡 点击图片可放大查看详情</p>
+            </div>
+
+            <div class="toggle-section" onclick="toggleSection('confirm-artifacts')" style="margin-top:12px;">
+                <div><strong>AI生成预览（多角度）</strong><br><small>展示客户确认前的个性化预览成果</small></div>
+                <div class="toggle-icon" id="confirm-artifacts-toggle">▼</div>
+            </div>
+            <div id="confirm-artifacts" class="hidden">
+                <div id="confirm-artifacts-list" class="artifact-grid"></div>
+            </div>
+
+            <div class="form-group">
+                <label>参展商名称 *</label>
+                <input type="text" class="form-control" placeholder="请输入企业或品牌名称">
+            </div>
+
+            <div class="form-group">
+                <label>联系人 *</label>
+                <input type="text" class="form-control" placeholder="联系人名称">
+            </div>
+
+            <div class="form-group">
+                <label>联系电话 *</label>
+                <input type="tel" class="form-control" placeholder="020-XXXX-XXXX">
+            </div>
+
+            <div class="form-group">
+                <label>电子邮箱 *</label>
+                <input type="email" class="form-control" placeholder="contact@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>选择支付方式 *</label>
+                <select class="form-control">
+                    <option value="">-- 请选择 --</option>
+                    <option value="wechat">微信支付</option>
+                    <option value="alipay">支付宝</option>
+                    <option value="transfer">银行转账</option>
+                    <option value="invoice">开具发票后支付</option>
+                </select>
+            </div>
+
+            <div style="background: #fff3cd; border-left: 4px solid #ff9800; padding: 12px; margin: 20px 0; border-radius: 4px; font-size: 13px;">
+                <strong><i class="bi bi-exclamation-circle"></i> 重要提示</strong><br>
+                • 订单确认后，我们将在24小时内与您联系进行方案确认<br>
+                • 支付后，搭建方案将进入生产排期<br>
+                • 展会前7天完成搭建并交付
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px; font-size: 13px;">
+                <input type="checkbox" id="agree-terms">
+                <label for="agree-terms">我已阅读并同意 <a href="#" style="color: #27ae60; text-decoration: none;">《服务条款》</a> 和 <a href="#" style="color: #27ae60; text-decoration: none;">《隐私政策》</a></label>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-custom btn-secondary-custom" onclick="goToStep(3)">← 上一步</button>
+                <button class="btn-custom btn-primary-custom" onclick="submitOrder()">确认下单并支付 →</button>
+            </div>
+
+            <!-- Step 4 AI助理 -->
+            <div class="ai-assistant show" id="step4-ai-assistant" style="margin-top: 30px;">
+                <div class="ai-assistant-header">
+                    <div>
+                        <i class="bi bi-clipboard-check"></i> <span class="zh">AI助理：订单最终确认</span><span class="en show">AI Assistant: Final Order Confirmation</span>
+                    </div>
+                    <button class="ai-action-btn" onclick="toggleAIChat('step4')" style="margin: 0;">
+                        <i class="bi bi-chat-dots"></i> <span class="zh">对话</span><span class="en show">Chat</span>
+                    </button>
+                </div>
+                
+                <!-- AI Chat Container -->
+                <div id="step4-chat" class="ai-chat-container" style="display: none;">
+                    <div id="step4-messages"></div>
+                    <div id="step4-typing" style="display: none;">
+                        <div class="ai-typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-input-container" id="step4-input" style="display: none;">
+                    <input type="text" class="ai-input" id="step4-input-field" placeholder="输入您的问题，例如：支付方式有哪些？" />
+                    <button class="ai-send-btn" onclick="sendAIMessage('step4')">
+                        <i class="bi bi-send"></i> <span class="zh">发送</span><span class="en show">Send</span>
+                    </button>
+                </div>
+                
+                <div class="ai-quick-actions" id="step4-quick" style="display: none;">
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step4', '支付方式有哪些？')">支付方式</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step4', '订单确认后多久交付？')">交付时间</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step4', '可以修改订单吗？')">订单修改</button>
+                    <button class="ai-quick-btn" onclick="sendQuickMessage('step4', '有什么售后服务？')">售后服务</button>
+                </div>
+                
+                <div class="ai-assistant-content" id="step4-summary">
+                    <span class="zh">
+                        ✅ 您已完成了所有步骤！现在只需确认以下信息，就可以提交订单。
+                    </span>
+                    <span class="en show">
+                        ✅ You have completed all steps! Just confirm the information and submit your order.
+                    </span>
+                </div>
+                <ul class="ai-checklist">
+                    <li><span class="zh">✓ 展位模板已选择</span><span class="en show">✓ Booth template selected</span></li>
+                    <li><span class="zh">✓ 合规校验已通过</span><span class="en show">✓ Compliance verified</span></li>
+                    <li><span class="zh">✓ 报价已确认</span><span class="en show">✓ Price confirmed</span></li>
+                    <li><span class="zh">待完成：填写企业和联系信息</span><span class="en show">Pending: Complete company & contact info</span></li>
+                    <li><span class="zh">待完成：同意服务条款</span><span class="en show">Pending: Agree to terms</span></li>
+                </ul>
+                <div style="margin-top: 12px; padding: 10px; background: #c8e6c9; border-radius: 6px; font-size: 12px; color: #2e7d32;">
+                    <span class="zh"><strong>✨ 订单确认后的流程：</strong> 1) 我们在24小时内与您联系确认 → 2) 3-5天内完成设计优化 → 3) 展会前7天完成搭建交付</span>
+                    <span class="en show"><strong>✨ Process after confirmation:</strong> 1) We'll contact you within 24 hours → 2) Design optimization in 3-5 days → 3) Booth delivery 7 days before the fair</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 订单成功 -->
+        <div id="success-content" class="content-card hidden">
+            <div class="success-message">
+                <h4><i class="bi bi-check-circle"></i> 订单创建成功！</h4>
+                <p style="margin-bottom: 0;">您的展位方案已提交，我们将尽快为您服务。</p>
+                
+                <div class="order-id">
+                    订单号: ORD20241221-A82B4C
+                </div>
+
+                <div style="background: white; padding: 16px; border-radius: 6px; margin-top: 16px; text-align: left; font-size: 13px; line-height: 1.8; color: #2c3e50;">
+                    <div style="font-weight: 600; margin-bottom: 12px;">📅 后续步骤</div>
+                    <div style="display: grid; gap: 12px;">
+                        <div><strong>24小时内:</strong> 搭建方团队将与您电话确认（020-1234-5678）</div>
+                        <div><strong>3-5天内:</strong> 完成方案设计与优化确认</div>
+                        <div><strong>7天前:</strong> 完成展位搭建并交付验收</div>
+                        <div><strong>展会后:</strong> 进行拆卸与回收，完整闭环</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <button class="btn-custom btn-primary-custom" onclick="resetForm()" style="width: 100%;">
+                        <i class="bi bi-plus-circle"></i> 返回首页 / 继续下单
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div style="text-align: center; padding: 40px 20px; color: #7f8c8d; font-size: 13px; background: white; margin-top: 40px; border-top: 1px solid #eee;">
+        <p>广交会绿色环保展位自助平台 · MVP原型 v1.0 | 
+            <a href="#" style="color: #27ae60; text-decoration: none;">关于我们</a> · 
+            <a href="#" style="color: #27ae60; text-decoration: none;">联系我们</a> · 
+            <a href="#" style="color: #27ae60; text-decoration: none;">帮助中心</a></p>
+        <p style="margin: 0;">© 2026 广交会 · 世福公司 · TB技术平台 | 保护环境，共建未来</p>
+    </div>
+
+    <script>
+        // ============= 登录功能 =============
+        let currentUser = null;
+
+        // 检查是否已登录
+        function checkLogin() {
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+        }
+
+        // 角色选择切换
+        function selectRole(role) {
+            // 移除所有选中状态
+            document.getElementById('role-exhibitor').classList.remove('selected');
+            document.getElementById('role-contractor').classList.remove('selected');
+            
+            // 添加选中状态
+            if (role === 'exhibitor') {
+                document.getElementById('role-exhibitor').classList.add('selected');
+            } else {
+                document.getElementById('role-contractor').classList.add('selected');
+            }
+        }
+
+        // 处理登录
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            // 验证用户名和密码
+            if (username === 'Demo' && password === 'Demo_123') {
+                currentUser = {
+                    username: username,
+                    role: role,
+                    roleLabel: role === 'exhibitor' ? '参展商' : '布展公司',
+                    roleLabelEn: role === 'exhibitor' ? 'Exhibitor' : 'Contractor',
+                    loginTime: new Date().toISOString()
+                };
+                
+                // 保存到 sessionStorage
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // 隐藏错误提示
+                errorDiv.classList.remove('show');
+                
+                // 显示主应用
+                showMainApp();
+            } else {
+                // 显示错误提示
+                errorDiv.classList.add('show');
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    errorDiv.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // 显示主应用
+        function showMainApp() {
+            const loginPage = document.getElementById('login-page');
+            const mainApp = document.getElementById('main-app');
+            
+            // 隐藏登录页面
+            loginPage.style.display = 'none';
+            
+            // 显示主应用
+            mainApp.classList.add('show');
+            
+            // 更新用户信息显示
+            if (currentUser) {
+                const userNameEl = document.getElementById('user-name');
+                const userAvatarEl = document.getElementById('user-avatar');
+                const roleBadgeEl = document.getElementById('role-badge');
+                
+                userNameEl.textContent = currentUser.username;
+                userAvatarEl.textContent = currentUser.username.charAt(0).toUpperCase();
+                
+                // 根据角色更新显示
+                if (currentUser.role === 'contractor') {
+                    // 布展公司
+                    userAvatarEl.style.background = 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)';
+                    roleBadgeEl.className = 'role-badge contractor';
+                    roleBadgeEl.innerHTML = `
+                        <span>🏗️</span>
+                        <span class="zh">${currentUser.roleLabel}</span>
+                        <span class="en">${currentUser.roleLabelEn}</span>
+                    `;
+                } else {
+                    // 参展商
+                    userAvatarEl.style.background = 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+                    roleBadgeEl.className = 'role-badge';
+                    roleBadgeEl.innerHTML = `
+                        <span>🏢</span>
+                        <span class="zh">${currentUser.roleLabel}</span>
+                        <span class="en">${currentUser.roleLabelEn}</span>
+                    `;
+                }
+            }
+        }
+
+        // 处理登出
+        function handleLogout() {
+            if (confirm('确定要退出登录吗？ / Are you sure you want to logout?')) {
+                // 清除用户信息
+                currentUser = null;
+                sessionStorage.removeItem('currentUser');
+                
+                // 隐藏主应用
+                const mainApp = document.getElementById('main-app');
+                mainApp.classList.remove('show');
+                
+                // 显示登录页面
+                const loginPage = document.getElementById('login-page');
+                loginPage.style.display = 'flex';
+                
+                // 清空登录表单
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                
+                // 重置到第一步
+                goToStep(1);
+            }
+        }
+
+        // 页面加载时检查登录状态
+        window.addEventListener('DOMContentLoaded', function() {
+            checkLogin();
+        });
+
+        // ============= 主应用功能 =============
+        // 确保页面可以滚动
+        document.body.style.overflow = 'auto';
+        document.documentElement.style.overflow = 'auto';
+        let currentStep = 1;
+        let selectedTemplate = null;
+        let selectedTemplateName = '简洁绿色展位';
+        let currentScenario = 'A';
+        let customizationLogs = [];
+        let artifactImages = [];
+
+        const scenarios = {
+            A: {
+                name: '方案一',
+                effectImage: '环保展位闭环资料251217/方案一/对外效果图.png',
+                effect: '环保展位闭环资料251217/方案一/对外效果图.png',
+                site: '环保展位闭环资料251217/方案一/搭建完毕现场照.png',
+                drawing: '环保展位闭环资料251217/方案一/施工图.png',
+                logo: '环保展位闭环资料251217/方案一/替换展商logo效果图.png',
+                bomOrMaterials: '环保展位闭环资料251217/方案一/材料清单.png',
+                base: 46000,
+                costs: { materials: 28500, labor: 12000, logistics: 3500, design: 2000 }
+            },
+            B: {
+                name: '方案二',
+                effectImage: '环保展位闭环资料251217/方案二/对外效果图.png',
+                effect: '环保展位闭环资料251217/方案二/对外效果图.png',
+                site: '环保展位闭环资料251217/方案二/完工照.png',
+                drawing: '环保展位闭环资料251217/方案二/施工图.png',
+                logo: '环保展位闭环资料251217/方案二/替换展商logo效果图.png',
+                bomOrMaterials: '环保展位闭环资料251217/方案二/BOM.png',
+                base: 48000,
+                costs: { materials: 30000, labor: 13000, logistics: 3800, design: 2000 }
+            }
+        };
+
+        function goToStep(step) {
+            // 隐藏所有内容
+            for (let i = 1; i <= 4; i++) {
+                const content = document.getElementById(`step-${i}-content`);
+                if (content) content.classList.add('hidden');
+            }
+            document.getElementById('success-content').classList.add('hidden');
+
+            // 显示目标步骤
+            const targetContent = document.getElementById(`step-${step}-content`);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            // 更新指示器
+            updateStepIndicator(step);
+            currentStep = step;
+
+            // 更新悬浮聊天面板的步骤信息
+            updateFloatingChatStep(step);
+
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+
+            // 进入报价步骤时更新报价与BOM图片
+            if (step === 3) {
+                updateQuote();
+                updateBomImage();
+            }
+
+            // 进入下单步骤时更新确认图片
+            if (step === 4) {
+                const img = document.getElementById('confirm-image');
+                img.src = scenarios[currentScenario].site || scenarios[currentScenario].effect;
+                // 更新订单摘要展示
+                document.getElementById('order-template-label').textContent = selectedTemplateName;
+                document.getElementById('order-total').textContent = document.getElementById('total-price').textContent;
+                // 展示AI生成的成果物
+                renderConfirmArtifacts();
+            }
+        }
+
+        function updateStepIndicator(activeStep) {
+            for (let i = 1; i <= 4; i++) {
+                const stepNum = document.querySelector(`.step-item:nth-child(${i}) .step-number`);
+                const stepLabel = document.querySelector(`.step-item:nth-child(${i}) .step-label`);
+                
+                if (i < activeStep) {
+                    stepNum.classList.add('completed');
+                    stepNum.classList.remove('active');
+                    stepLabel.classList.remove('active');
+                } else if (i === activeStep) {
+                    stepNum.classList.add('active');
+                    stepNum.classList.remove('completed');
+                    stepLabel.classList.add('active');
+                } else {
+                    stepNum.classList.remove('active', 'completed');
+                    stepLabel.classList.remove('active');
+                }
+            }
+        }
+
+        function selectTemplate(element, templateId, templateName) {
+            // 移除其他选中状态
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 添加选中状态
+            element.classList.add('selected');
+            selectedTemplate = templateId;
+            selectedTemplateName = templateName;
+            document.getElementById('selected-template-label').textContent = selectedTemplateName;
+            // 依据模板映射选择对应方案库素材
+            const map = { T001: 'A', T002: 'B', T003: 'A' };
+            currentScenario = map[templateId] || 'A';
+            // 更新素材预览
+            document.getElementById('gallery-site').src = scenarios[currentScenario].site;
+            document.getElementById('gallery-drawing').src = scenarios[currentScenario].drawing;
+            document.getElementById('gallery-logo').src = scenarios[currentScenario].logo;
+            
+            // 显示AI助理和更新检查项
+            updateStep1Assistant();
+        }
+
+        function updateStep1Assistant() {
+            document.getElementById('step1-ai-assistant').classList.add('show');
+            const template = document.getElementById('template-size').value ? '✓' : '';
+            const size = document.getElementById('template-size').value ? '✓' : '';
+            const style = document.getElementById('template-style').value ? '✓' : '';
+            
+            // 更新检查项
+            document.getElementById('check-template').className = selectedTemplate ? 'completed' : '';
+            document.getElementById('check-size').className = size ? 'completed' : '';
+            document.getElementById('check-style').className = style ? 'completed' : '';
+        }
+
+        // 添加事件监听器，在表单变化时更新AI助理检查项
+        document.addEventListener('DOMContentLoaded', function() {
+            const templateSizeEl = document.getElementById('template-size');
+            const templateStyleEl = document.getElementById('template-style');
+            if (templateSizeEl) templateSizeEl.addEventListener('change', updateStep1Assistant);
+            if (templateStyleEl) templateStyleEl.addEventListener('change', updateStep1Assistant);
+        });
+
+        // 模板选择会自动更新 currentScenario，无需显式切换
+
+        function runCompliance() {
+            const resultsDiv = document.getElementById('compliance-results');
+            resultsDiv.classList.remove('hidden');
+            
+            // 动画效果
+            setTimeout(() => {
+                const progressFill = resultsDiv.querySelector('.progress-fill');
+                progressFill.style.width = '92%';
+            }, 300);
+        }
+
+        function updateQuote() {
+            const data = scenarios[currentScenario];
+            document.getElementById('cost-materials').textContent = formatNumber(data.costs.materials);
+            document.getElementById('cost-labor').textContent = formatNumber(data.costs.labor);
+            document.getElementById('cost-logistics').textContent = formatNumber(data.costs.logistics);
+            document.getElementById('cost-design').textContent = formatNumber(data.costs.design);
+            const subtotal = data.costs.materials + data.costs.labor + data.costs.logistics + data.costs.design;
+            document.getElementById('subtotal').textContent = formatNumber(subtotal);
+            
+            // 添加可选服务费用
+            const optionalsCost = Object.values(selectedOptionals).reduce((a, b) => a + b, 0);
+            document.getElementById('cost-optionals') && (document.getElementById('cost-optionals').textContent = formatNumber(optionalsCost));
+            
+            const basePrice = subtotal + optionalsCost;
+            document.getElementById('base-price').textContent = formatNumber(basePrice);
+            
+            const opFee = Math.round(basePrice * 0.07);
+            const techFee = Math.round(basePrice * 0.03);
+            const total = basePrice + opFee + techFee;
+            document.getElementById('op-fee').textContent = formatNumber(opFee);
+            document.getElementById('tech-fee').textContent = formatNumber(techFee);
+            document.getElementById('total-price').textContent = formatNumber(total);
+            document.getElementById('order-total') && (document.getElementById('order-total').textContent = formatNumber(total));
+        }
+
+        function updateBomImage() {
+            const img = document.getElementById('bom-image');
+            img.src = scenarios[currentScenario].bomOrMaterials;
+        }
+
+        function toggleSection(id) {
+            console.log('toggleSection called with id:', id);
+            const el = document.getElementById(id);
+            console.log('Found element:', el);
+            if (!el) {
+                console.error('Element not found:', id);
+                return;
+            }
+            el.classList.toggle('hidden');
+            console.log('After toggle, hidden?', el.classList.contains('hidden'));
+            const iconId = id === 'gallery-section' ? 'gallery-toggle' : id === 'bom-image-section' ? 'bom-toggle' : id === 'confirm-image-section' ? 'confirm-toggle' : id === 'custom-section' ? 'custom-toggle' : null;
+            if (iconId) {
+                const icon = document.getElementById(iconId);
+                if (icon) {
+                    icon.classList.toggle('open');
+                }
+            }
+        }
+
+        function formatNumber(n) {
+            return n.toLocaleString('zh-CN');
+        }
+
+        function submitOrder() {
+            const agreeCheckbox = document.getElementById('agree-terms');
+            if (!agreeCheckbox.checked) {
+                alert('请先同意服务条款和隐私政策');
+                return;
+            }
+
+            // 隐藏订单表单，显示成功页面
+            document.getElementById('step-4-content').classList.add('hidden');
+            document.getElementById('success-content').classList.remove('hidden');
+
+            // 更新指示器为已完成
+            for (let i = 1; i <= 4; i++) {
+                const stepNum = document.querySelector(`.step-item:nth-child(${i}) .step-number`);
+                stepNum.classList.add('completed');
+                stepNum.classList.remove('active');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function resetForm() {
+            goToStep(1);
+            document.getElementById('step-1-content').classList.remove('hidden');
+            document.getElementById('template-size').value = '';
+            document.getElementById('template-style').value = '';
+            
+            // 重置指示器
+            document.querySelectorAll('.step-number').forEach(num => {
+                num.classList.remove('active', 'completed');
+            });
+            document.querySelectorAll('.step-label').forEach(label => {
+                label.classList.remove('active');
+            });
+            
+            // 重新设置第一步为活跃
+            updateStepIndicator(1);
+            // 默认展示A方案库素材
+            document.getElementById('gallery-site').src = scenarios['A'].site;
+            document.getElementById('gallery-drawing').src = scenarios['A'].drawing;
+            document.getElementById('gallery-logo').src = scenarios['A'].logo;
+        }
+
+        // 初始化
+        updateStepIndicator(1);
+        // 默认模板与素材
+        document.getElementById('selected-template-label').textContent = selectedTemplateName;
+        document.getElementById('template-image-1').src = scenarios['A'].effectImage;
+        document.getElementById('template-image-2').src = scenarios['B'].effectImage;
+
+        /* ===== AI 个性化预览逻辑 ===== */
+        const frontCanvas = document.getElementById('preview-front');
+        const leftCanvas = document.getElementById('preview-left');
+        const rightCanvas = document.getElementById('preview-right');
+
+        /* ===== 语言切换 ===== */
+        let currentLanguage = 'zh';
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const isEn = lang === 'en';
+            document.querySelectorAll('.zh').forEach(el => el.classList.toggle('hide', isEn));
+            document.querySelectorAll('.en').forEach(el => el.classList.toggle('show', isEn));
+            document.getElementById('lang-zh').classList.toggle('active', !isEn);
+            document.getElementById('lang-en').classList.toggle('active', isEn);
+            
+            // 如果模态框打开，更新其内容
+            if (document.getElementById('detail-modal').classList.contains('show')) {
+                fillOptionalServices(isEn);
+            }
+            
+            // 更新订单摘要中的可选服务语言
+            if (Object.keys(selectedOptionals).length > 0) {
+                updateOrderOptionalsSummary();
+            }
+        }
+
+        function loadBaseImage() {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = scenarios[currentScenario].effectImage;
+                img.onload = () => resolve(img);
+            });
+        }
+
+        function loadLogoImage() {
+            return new Promise((resolve) => {
+                const file = document.getElementById('logo-upload').files[0];
+                if (!file) return resolve(null);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function parsePrompt(prompt) {
+            const cfg = { brightness: 1.0, saturate: 1.0, hue: 0, primary: null, position: null };
+            const p = (prompt || '').toLowerCase();
+            if (p.includes('明亮')) cfg.brightness = 1.15;
+            if (p.includes('鲜艳') || p.includes('饱和')) cfg.saturate = 1.2;
+            if (p.includes('绿色')) cfg.primary = '#27ae60';
+            if (p.includes('蓝色')) cfg.primary = '#2980b9';
+            if (p.includes('科技')) cfg.hue = 20;
+            if (p.includes('自然')) cfg.hue = -10;
+            if (p.includes('居中')) cfg.position = 'center';
+            if (p.includes('左上')) cfg.position = 'top-left';
+            if (p.includes('右上')) cfg.position = 'top-right';
+            if (p.includes('左下')) cfg.position = 'bottom-left';
+            if (p.includes('右下')) cfg.position = 'bottom-right';
+            return cfg;
+        }
+
+        async function applyCustomization() {
+            const baseImg = await loadBaseImage();
+            const logoImg = await loadLogoImage();
+            const primary = document.getElementById('color-primary').value;
+            const secondary = document.getElementById('color-secondary').value;
+            const positionSel = document.getElementById('logo-position').value;
+            const prompt = document.getElementById('prompt-text').value;
+            const promptCfg = parsePrompt(prompt);
+
+            // 显示加载动画
+            const btnEle = event.target;
+            const originalText = btnEle.innerHTML;
+            btnEle.disabled = true;
+            btnEle.innerHTML = '<span class="loading-spinner"></span>' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
+
+            const canvases = [frontCanvas, leftCanvas, rightCanvas];
+            const angles = [0, -8, 8];
+            const titles = [currentLanguage === 'en' ? 'Front View' : '正面', currentLanguage === 'en' ? 'Left Corner' : '左前角', currentLanguage === 'en' ? 'Right Corner' : '右前角'];
+
+            canvases.forEach((canvas, idx) => {
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width = canvas.clientWidth;
+                const h = canvas.height = canvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+
+                // 背景渐变
+                const grad = ctx.createLinearGradient(0, 0, w, h);
+                grad.addColorStop(0, '#f8f9fa');
+                grad.addColorStop(1, '#e9ecef');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+
+                // 绘制基础图片（中心）
+                ctx.save();
+                // angle transform
+                ctx.translate(w/2, h/2);
+                ctx.rotate(angles[idx] * Math.PI / 180);
+                // draw base image scaled
+                const scale = Math.min(w / baseImg.width, h / baseImg.height) * 0.85;
+                const dw = baseImg.width * scale;
+                const dh = baseImg.height * scale;
+                ctx.filter = `brightness(${promptCfg.brightness}) saturate(${promptCfg.saturate}) hue-rotate(${promptCfg.hue}deg)`;
+                ctx.drawImage(baseImg, -dw/2, -dh/2, dw, dh);
+                ctx.filter = 'none';
+                ctx.restore();
+
+                // 主色透明覆盖
+                const overlayColor = promptCfg.primary || primary;
+                ctx.globalAlpha = 0.15;
+                ctx.fillStyle = overlayColor;
+                ctx.fillRect(0, 0, w, h);
+                ctx.globalAlpha = 1.0;
+
+                // 绘制装饰边框
+                ctx.strokeStyle = overlayColor;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.4;
+                ctx.strokeRect(10, 10, w-20, h-20);
+                ctx.globalAlpha = 1.0;
+
+                // 绘制Logo
+                if (logoImg) {
+                    const pos = promptCfg.position || positionSel;
+                    const lw = Math.min(w * 0.25, 150);
+                    const lh = lw * (logoImg.height / logoImg.width);
+                    let x = (w - lw)/2, y = (h - lh)/2;
+                    if (pos === 'top-left') { x = 12; y = 12; }
+                    if (pos === 'top-right') { x = w - lw - 12; y = 12; }
+                    if (pos === 'bottom-left') { x = 12; y = h - lh - 12; }
+                    if (pos === 'bottom-right') { x = w - lw - 12; y = h - lh - 12; }
+                    // Logo背景圆角框
+                    ctx.globalAlpha = 0.95;
+                    ctx.fillStyle = 'white';
+                    ctx.shadowColor = 'rgba(0,0,0,0.1)';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 2;
+                    ctx.beginPath();
+                    ctx.roundRect(x-4, y-4, lw+8, lh+8, 6);
+                    ctx.fill();
+                    ctx.shadowColor = 'transparent';
+                    ctx.drawImage(logoImg, x, y, lw, lh);
+                    ctx.globalAlpha = 1.0;
+                }
+
+                // 标题与说明
+                ctx.fillStyle = overlayColor;
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.globalAlpha = 0.7;
+                ctx.fillText(titles[idx], w/2, 22);
+                ctx.globalAlpha = 1.0;
+
+                // 角标签
+                ctx.fillStyle = overlayColor;
+                ctx.globalAlpha = 0.6;
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.fillText('AI Preview', w - 12, h - 8);
+                ctx.globalAlpha = 1.0;
+            });
+
+            // 显示AI效果图（使用替换Logo的效果图）
+            const logoImgSrc = scenarios[currentScenario].logo;
+            if (logoImgSrc) {
+                const aiOutputImg = document.getElementById('ai-output-image');
+                aiOutputImg.src = logoImgSrc;
+                document.getElementById('ai-output-section').style.display = 'block';
+            }
+
+            // 恢复按钮状态
+            setTimeout(() => {
+                btnEle.disabled = false;
+                btnEle.innerHTML = originalText;
+            }, 1500);
+
+            // log customization
+            customizationLogs.push({
+                time: new Date().toISOString(),
+                template: selectedTemplateName,
+                scenario: currentScenario,
+                colors: { primary, secondary },
+                logo: !!document.getElementById('logo-upload').files[0],
+                position: promptCfg.position || positionSel,
+                prompt
+            });
+        }
+
+        function saveSnapshot() {
+            const snaps = [frontCanvas, leftCanvas, rightCanvas].map(c => c.toDataURL('image/png'));
+            const titles = ['正面预览', '左前角预览', '右前角预览'];
+            snaps.forEach((dataUrl, idx) => artifactImages.push({ title: titles[idx], url: dataUrl }));
+            renderArtifacts();
+        }
+
+        function renderArtifacts() {
+            const list = document.getElementById('artifact-list');
+            if (!list) return;
+            list.innerHTML = artifactImages.map(a => `
+                <div class="artifact-item">
+                    <img src="${a.url}" alt="${a.title}">
+                    <div style="font-size:12px; color:#7f8c8d; margin-top:4px;">${a.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderConfirmArtifacts() {
+            const list = document.getElementById('confirm-artifacts-list');
+            if (!list) return;
+            list.innerHTML = artifactImages.map(a => `
+                <div class="artifact-item">
+                    <img src="${a.url}" alt="${a.title}">
+                    <div style="font-size:12px; color:#7f8c8d; margin-top:4px;">${a.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function exportAdjustments() {
+            const blob = new Blob([JSON.stringify({ logs: customizationLogs, artifacts: artifactImages }, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customization_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 模态对话框功能
+        const templateDetails = {
+            T001: {
+                name_zh: '简洁绿色展位',
+                name_en: 'Simple Green Booth',
+                description_zh: '采用环保铝合金框架，设计简洁现代，适合中小企业展示核心产品。',
+                description_en: 'Features eco-friendly aluminum frame with clean modern design, ideal for small to medium enterprises to showcase core products.',
+                specs_zh: ['尺寸: 6m × 3m (18㎡)', '材料: 铝合金框架', '可复用率: 92%', '建设周期: 3-4天'],
+                specs_en: ['Size: 6m × 3m (18㎡)', 'Material: Aluminum frame', 'Reusability: 92%', 'Construction: 3-4 days'],
+                basePrice: 18000
+            },
+            T002: {
+                name_zh: '生态互动展位',
+                name_en: 'Eco-Interactive Booth',
+                description_zh: '融合木质框架和生态元素，创造沉浸式体验，适合展示环保理念和产品互动。',
+                description_en: 'Combines wooden frame with ecological elements to create immersive experience, perfect for showcasing environmental concepts and interactive products.',
+                specs_zh: ['尺寸: 6m × 6m (36㎡)', '材料: 木质框架', '可复用率: 88%', '建设周期: 4-5天'],
+                specs_en: ['Size: 6m × 6m (36㎡)', 'Material: Wood frame', 'Reusability: 88%', 'Construction: 4-5 days'],
+                basePrice: 32000
+            },
+            T003: {
+                name_zh: '高端品牌展位',
+                name_en: 'Premium Brand Booth',
+                description_zh: '结合铝合金与木质材料，设计高端大气，适合品牌形象展示和高端洽谈。',
+                description_en: 'Combines aluminum and wood materials with premium elegant design, ideal for brand image display and executive meetings.',
+                specs_zh: ['尺寸: 6m × 6m (36㎡)', '材料: 铝合金+木质', '可复用率: 85%', '建设周期: 5-6天'],
+                specs_en: ['Size: 6m × 6m (36㎡)', 'Material: Aluminum + Wood', 'Reusability: 85%', 'Construction: 5-6 days'],
+                basePrice: 42000
+            }
+        };
+
+        const optionalServices = {
+            colors: [
+                { id: 'c1', name_zh: '标准绿色', name_en: 'Standard Green', price: 0, icon: '🎨' },
+                { id: 'c2', name_zh: '深蓝主题', name_en: 'Deep Blue Theme', price: 2000, icon: '🎨' },
+                { id: 'c3', name_zh: '土色系', name_en: 'Earth Tones', price: 1500, icon: '🎨' },
+                { id: 'c4', name_zh: '现代黑白', name_en: 'Modern B&W', price: 2500, icon: '🎨' }
+            ],
+            lighting: [
+                { id: 'l1', name_zh: '基础照明', name_en: 'Basic Lighting', price: 0, icon: '💡' },
+                { id: 'l2', name_zh: '强化LED照明', name_en: 'Enhanced LED', price: 5000, icon: '💡' },
+                { id: 'l3', name_zh: '动态灯光效果', name_en: 'Dynamic Effects', price: 8000, icon: '💡' }
+            ],
+            materials: [
+                { id: 'm1', name_zh: '标准材料', name_en: 'Standard Materials', price: 0, icon: '📦' },
+                { id: 'm2', name_zh: '防水升级', name_en: 'Waterproof Upgrade', price: 3000, icon: '📦' },
+                { id: 'm3', name_zh: '防火认证材料', name_en: 'Fire-Rated Materials', price: 4000, icon: '📦' }
+            ],
+            services: [
+                { id: 's1', name_zh: '标准安装', name_en: 'Standard Setup', price: 0, icon: '👷' },
+                { id: 's2', name_zh: '24小时在线支持', name_en: '24/7 Support', price: 2000, icon: '👷' },
+                { id: 's3', name_zh: '专业设计咨询', name_en: 'Design Consultation', price: 3000, icon: '👷' },
+                { id: 's4', name_zh: '展位清洁服务', name_en: 'Cleaning Service', price: 1500, icon: '👷' }
+            ]
+        };
+
+        let selectedOptionals = {};
+
+        function openModal(templateId) {
+            console.log('openModal called with templateId:', templateId);
+            selectedOptionals = {}; // 重置选择
+            const modal = document.getElementById('detail-modal');
+            console.log('Found modal element:', modal);
+            
+            const template = templateDetails[templateId];
+            console.log('Found template:', template);
+            
+            if (!modal) {
+                console.error('Modal element not found!');
+                return;
+            }
+            
+            if (!template) {
+                console.error('Template not found for ID:', templateId);
+                return;
+            }
+            
+            const isEn = currentLanguage === 'en';
+
+            // 设置模态框标题和描述
+            document.getElementById('modal-template-name').textContent = isEn ? template.name_en : template.name_zh;
+            document.getElementById('modal-template-desc').textContent = isEn ? template.description_en : template.description_zh;
+
+            // 设置规格
+            const specsList = document.getElementById('modal-specs-list');
+            specsList.innerHTML = (isEn ? template.specs_en : template.specs_zh).map(spec => 
+                `<li style="padding: 6px 0; color: #555;">✓ ${spec}</li>`
+            ).join('');
+
+            // 填充可选服务
+            fillOptionalServices(isEn);
+
+            // 更新基础价格
+            document.getElementById('modal-base-price').textContent = '¥' + formatNumber(template.basePrice);
+            updateModalTotalPrice();
+
+            console.log('About to show modal');
+            modal.classList.add('show');
+            console.log('Modal classes after show:', modal.classList.toString());
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('show');
+        }
+
+        function fillOptionalServices(isEn) {
+            const categoriesOrder = ['colors', 'lighting', 'materials', 'services'];
+            const categoryLabels = isEn 
+                ? { colors: 'Color Schemes', lighting: 'Lighting Options', materials: 'Materials', services: 'Additional Services' }
+                : { colors: '配色方案', lighting: '照明方案', materials: '材料选项', services: '增值服务' };
+
+            const optionalsContainer = document.getElementById('modal-optionals');
+            optionalsContainer.innerHTML = '';
+
+            categoriesOrder.forEach(category => {
+                const section = document.createElement('div');
+                section.className = 'modal-section';
+
+                const title = document.createElement('div');
+                title.className = 'modal-section-title';
+                title.innerHTML = `<i class="bi bi-${getCategoryIcon(category)}"></i> <span>${categoryLabels[category]}</span>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'optional-grid';
+
+                optionalServices[category].forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'optional-card';
+                    card.id = `optional-${item.id}`;
+                    card.innerHTML = `
+                        <div class="optional-card-icon">${item.icon}</div>
+                        <div class="optional-card-name">${isEn ? item.name_en : item.name_zh}</div>
+                        ${item.price > 0 ? `<div class="optional-card-price">+¥${formatNumber(item.price)}</div>` : '<div class="optional-card-price">免费 / Free</div>'}
+                    `;
+                    card.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleOptional(item.id, category, item.price);
+                    };
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(title);
+                section.appendChild(grid);
+                optionalsContainer.appendChild(section);
+            });
+        }
+
+        function getCategoryIcon(category) {
+            const icons = {
+                colors: 'palette',
+                lighting: 'brightness-high',
+                materials: 'box2',
+                services: 'people-fill'
+            };
+            return icons[category] || 'gear';
+        }
+
+        function toggleOptional(itemId, category, price) {
+            const cardId = `optional-${itemId}`;
+            const card = document.getElementById(cardId);
+            
+            // 对于配色、照明等单选项，移除同分类的其他选择
+            if (['colors', 'lighting', 'materials'].includes(category)) {
+                document.querySelectorAll(`#modal-optionals .optional-card.selected`).forEach(c => {
+                    const cId = c.id.replace('optional-', '');
+                    // 只移除同分类的
+                    if (optionalServices[category].some(item => item.id === cId)) {
+                        c.classList.remove('selected');
+                        delete selectedOptionals[cId];
+                    }
+                });
+            }
+
+            if (card.classList.contains('selected')) {
+                card.classList.remove('selected');
+                delete selectedOptionals[itemId];
+            } else {
+                card.classList.add('selected');
+                selectedOptionals[itemId] = price;
+            }
+
+            updateModalTotalPrice();
+        }
+
+        function updateModalTotalPrice() {
+            const basePrice = templateDetails[selectedTemplate]?.basePrice || 0;
+            const optionalsCost = Object.values(selectedOptionals).reduce((a, b) => a + b, 0);
+            const total = basePrice + optionalsCost;
+            document.getElementById('modal-optionals-cost').textContent = formatNumber(optionalsCost);
+            document.getElementById('modal-total-price').textContent = formatNumber(total);
+        }
+
+        function confirmModalSelection() {
+            // 保存选择到全局数据中，并关闭模态框
+            customizationLogs.push({
+                timestamp: new Date().toISOString(),
+                action: '选择可选服务',
+                template: selectedTemplateName,
+                optionals: Object.keys(selectedOptionals),
+                cost: Object.values(selectedOptionals).reduce((a, b) => a + b, 0)
+            });
+            
+            // 更新订单摘要中的可选服务显示
+            updateOrderOptionalsSummary();
+            
+            closeModal();
+            // 更新报价
+            updateQuote();
+        }
+
+        function updateOrderOptionalsSummary() {
+            const summaryDiv = document.getElementById('order-optionals-summary');
+            const listDiv = document.getElementById('order-optionals-list');
+            
+            if (Object.keys(selectedOptionals).length === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+            
+            summaryDiv.style.display = 'block';
+            const isEn = currentLanguage === 'en';
+            const items = [];
+            
+            // 收集所有选择的项目名称
+            Object.keys(selectedOptionals).forEach(itemId => {
+                for (let category of Object.keys(optionalServices)) {
+                    const item = optionalServices[category].find(i => i.id === itemId);
+                    if (item) {
+                        items.push({
+                            name: isEn ? item.name_en : item.name_zh,
+                            price: item.price
+                        });
+                        break;
+                    }
+                }
+            });
+            
+            // 更新列表显示
+            listDiv.innerHTML = items.map(item => 
+                `<li style="color: #2c3e50; padding: 6px 0; border-bottom: 1px solid rgba(39,174,96,0.2);">
+                    ✓ ${item.name}${item.price > 0 ? ` <span style="float: right; color: #27ae60; font-weight: 600;">+¥${formatNumber(item.price)}</span>` : ''}
+                </li>`
+            ).join('');
+        }
+
+        // 监听语言切换并更新模态框内容
+        window.addEventListener('languageChanged', function() {
+            if (document.getElementById('detail-modal').classList.contains('show')) {
+                fillOptionalServices(currentLanguage === 'en');
+            }
+        });
+
+        // ====== AI 聊天功能 ======
+        
+        // AI 响应数据库（中英文双语）
+        const aiResponses = {
+            step1: {
+                keywords: {
+                    '模板': { zh: '我们提供3种展位模板：\n\n📦 基础版 - 适合预算有限的企业，价格¥28,000-¥36,000\n⭐ 标准版 - 最受欢迎的选择，可复用率70%，价格¥38,000-¥46,000\n💎 高级版 - 品牌形象展示，可复用率90%，价格¥58,000-¥72,000\n\n您可以根据预算和品牌定位选择。', en: 'We offer 3 booth templates:\n\n📦 Basic - For budget-conscious companies, ¥28,000-¥36,000\n⭐ Standard - Most popular, 70% reusability, ¥38,000-¥46,000\n💎 Premium - Brand showcase, 90% reusability, ¥58,000-¥72,000' },
+                    '尺寸': { zh: '展位尺寸建议：\n\n• 3m×3m (9㎡) - 适合初创企业\n• 3m×4m (12㎡) - 小型企业标配\n• 3m×6m (18㎡) - 中型企业推荐\n• 6m×6m (36㎡) - 大型企业展示\n\n尺寸越大，展示空间越充足，但成本也相应增加。', en: 'Booth size recommendations:\n\n• 3m×3m (9㎡) - Startups\n• 3m×4m (12㎡) - Small businesses\n• 3m×6m (18㎡) - Mid-sized companies\n• 6m×6m (36㎡) - Large enterprises' },
+                    '可复用': { zh: '可复用率是指展位搭建材料在展会结束后可以再次使用的比例。\n\n🔄 高可复用率的优势：\n• 降低长期成本\n• 环保可持续\n• 符合广交会绿色理念\n• 下次参展可直接复用\n\n我们的标准版可复用率达70%，高级版更高达90%！', en: 'Reusability rate refers to the percentage of booth materials that can be reused after the fair.\n\n🔄 Benefits:\n• Lower long-term costs\n• Eco-friendly\n• Aligns with Canton Fair green initiative\n• Direct reuse for next exhibitions' },
+                    'AI': { zh: '当前AI预览功能可以为您生成多角度的展位效果图！\n\n🎨 功能特点：\n• 3D视角效果预览\n• 不同材质模拟\n• 灯光效果展示\n• 实际案例参考\n\n点击"AI生成预览"按钮即可查看您选择的模板的实际效果！', en: 'Current AI preview can generate multi-angle booth renderings!\n\n🎨 Features:\n• 3D perspective views\n• Material simulation\n• Lighting effects\n• Real case references\n\nClick "AI Preview" to see the actual effect!' },
+                    '价格': { zh: '不同尺寸的价格差异：\n\n标准版为例：\n• 3m×3m → ¥38,000\n• 3m×4m → ¥42,000\n• 3m×6m → ¥46,000\n• 6m×6m → ¥68,000\n\n价格包含：设计、材料、搭建、拆卸、清运。运营服务费7%，平台技术费3%另计。', en: 'Price differences by size (Standard):\n\n• 3m×3m → ¥38,000\n• 3m×4m → ¥42,000\n• 3m×6m → ¥46,000\n• 6m×6m → ¥68,000\n\nIncludes: design, materials, installation, removal. Plus 7% operation fee and 3% platform fee.' }
+                },
+                default: { zh: '您好！我是AI助理，专门帮助您选择合适的展位模板。\n\n🤔 我可以帮您：\n• 了解不同模板的特点\n• 比较价格和性价比\n• 选择合适的尺寸\n• 解释可复用率的意义\n\n请随时向我提问！', en: 'Hello! I\'m the AI assistant helping you choose the right booth template.\n\n🤔 I can help with:\n• Understanding template features\n• Comparing prices and value\n• Selecting the right size\n• Explaining reusability\n\nFeel free to ask!' }
+            },
+            step2: {
+                keywords: {
+                    '合规': { zh: '广交会对展位有严格的合规要求：\n\n✅ 必须通过的检查：\n• 尺寸符合展位规格\n• 材料达到环保标准\n• 消防安全合规\n• 结构稳定性达标\n\n如果某项不通过，我会提供具体的修改建议，帮您快速解决问题！', en: 'Canton Fair has strict compliance requirements:\n\n✅ Mandatory checks:\n• Size meets specifications\n• Materials meet environmental standards\n• Fire safety compliance\n• Structural stability\n\nIf any item fails, I\'ll provide specific modification suggestions!' },
+                    '消防': { zh: '消防安全要求包括：\n\n🔥 关键标准：\n• 疏散通道宽度 ≥ 1.2m\n• 使用防火材料\n• 应急出口标识清晰\n• 灭火器配置合规\n• 电气线路符合规范\n\n我们的标准模板已充分考虑这些要求，通过率高达95%！', en: 'Fire safety requirements:\n\n🔥 Key standards:\n• Evacuation aisle ≥ 1.2m\n• Fire-resistant materials\n• Clear emergency exit signs\n• Fire extinguisher compliant\n• Electrical wiring standards\n\nOur standard templates achieve 95% pass rate!' },
+                    '材料': { zh: '环保材料认证要求：\n\n♻️ 必须达到的标准：\n• 甲醛释放量 ≤ E1级\n• VOC含量符合国标\n• 可回收材料优先\n• 获得绿色建材认证\n\n我们所有模板都使用经过认证的环保材料，100%符合广交会标准！', en: 'Environmental material certification:\n\n♻️ Required standards:\n• Formaldehyde ≤ E1 grade\n• VOC meets national standards\n• Recyclable materials preferred\n• Green building material certified\n\nAll our templates use certified eco-friendly materials, 100% compliant!' },
+                    '疏散': { zh: '疏散通道标准：\n\n🚶 重要规范：\n• 主通道宽度 ≥ 1.2m\n• 次通道宽度 ≥ 0.9m\n• 通道不得堆放物品\n• 保持畅通无阻\n• 明确标识出口方向\n\n如果当前方案通道过窄，我可以建议调整展品布置位置。', en: 'Evacuation aisle standards:\n\n🚶 Key regulations:\n• Main aisle ≥ 1.2m\n• Secondary aisle ≥ 0.9m\n• No obstructions\n• Keep clear at all times\n• Clear exit signage\n\nIf your current design is too narrow, I can suggest layout adjustments.' }
+                },
+                default: { zh: '我正在为您进行展位合规检查。\n\n🛡️ 合规校验包括：\n• 尺寸规格检查\n• 材料环保认证\n• 消防安全标准\n• 结构稳定性评估\n\n如有任何问题，请随时询问！', en: 'I\'m conducting compliance checks for your booth.\n\n🛡️ Checks include:\n• Size specifications\n• Material certifications\n• Fire safety standards\n• Structural stability\n\nFeel free to ask anything!' }
+            },
+            step3: {
+                keywords: {
+                    '服务费': { zh: '报价包含两项服务费：\n\n💼 运营服务费 (7%)：\n• 专业团队现场管理\n• 搭建质量监督\n• 问题应急处理\n• 展期维护服务\n\n⚙️ 平台技术费 (3%)：\n• 在线自助系统维护\n• AI设计工具支持\n• 订单管理系统\n• 客户服务平台\n\n这些费用确保您获得全方位的专业服务！', en: 'The quote includes two service fees:\n\n💼 Operation Fee (7%):\n• Professional on-site management\n• Quality supervision\n• Emergency handling\n• Maintenance during exhibition\n\n⚙️ Platform Fee (3%):\n• Self-service system maintenance\n• AI design tool support\n• Order management\n• Customer service platform' },
+                    '增值': { zh: '我推荐以下增值服务：\n\n🌟 提升专业度：\n• 强化LED照明 (+¥1,200) - 让展品更显眼\n• 定制品牌装饰 (+¥1,800) - 强化品牌形象\n\n🛡️ 保障服务：\n• 24小时在线支持 (+¥800) - 随时解决问题\n• 现场快速响应 (+¥600) - 1小时内到场\n\n根据您的预算和需求，可以灵活选择！', en: 'Recommended add-on services:\n\n🌟 Enhance professionalism:\n• Enhanced LED lighting (+¥1,200)\n• Custom brand decoration (+¥1,800)\n\n🛡️ Support services:\n• 24/7 online support (+¥800)\n• On-site rapid response (+¥600)\n\nFlexible selection based on your budget!' },
+                    '优惠': { zh: '当前优惠政策：\n\n🎁 优惠方式：\n• 早鸟优惠：提前30天预订享95折\n• 老客户：返展客户享9折\n• 大单优惠：3个以上展位享额外折扣\n• 推荐奖励：推荐新客户获¥500代金券\n\n您目前可享受的优惠，我会在订单确认时自动计算！', en: 'Current promotional offers:\n\n🎁 Discounts:\n• Early bird: 5% off for 30-day advance booking\n• Returning customers: 10% off\n• Bulk orders: Extra discount for 3+ booths\n• Referral reward: ¥500 voucher\n\nEligible discounts will be automatically calculated!' },
+                    '成本': { zh: '降低成本的建议：\n\n💡 省钱策略：\n• 选择标准版而非高级版\n• 选择较小尺寸（如3×4m而非3×6m）\n• 减少可选增值服务\n• 提高可复用率，降低长期成本\n• 参加早鸟优惠活动\n\n但要注意平衡成本和展示效果，确保达到营销目标！', en: 'Cost reduction suggestions:\n\n💡 Money-saving strategies:\n• Choose Standard instead of Premium\n• Select smaller size (3×4m vs 3×6m)\n• Reduce optional add-ons\n• Higher reusability = lower long-term costs\n• Early bird discounts\n\nBalance cost with exhibition effectiveness!' }
+                },
+                default: { zh: '我已为您生成详细的报价分析。\n\n💰 报价包括：\n• 基础材料和人工成本\n• 运营服务费 (7%)\n• 平台技术费 (3%)\n• 可选增值服务\n\n有任何价格问题，请随时问我！', en: 'I\'ve generated a detailed price quote.\n\n💰 Includes:\n• Base materials and labor\n• Operation fee (7%)\n• Platform fee (3%)\n• Optional add-ons\n\nAsk me any pricing questions!' }
+            },
+            step4: {
+                keywords: {
+                    '支付': { zh: '我们支持多种支付方式：\n\n💳 可选支付：\n• 微信支付 - 即时到账\n• 支付宝 - 便捷安全\n• 银行转账 - 适合大额支付\n• 开票后支付 - 企业客户优选\n\n建议选择最方便的支付方式，所有方式均安全可靠！', en: 'We support multiple payment methods:\n\n💳 Options:\n• WeChat Pay - Instant\n• Alipay - Convenient & secure\n• Bank transfer - For large amounts\n• Invoice payment - Preferred by enterprises\n\nAll methods are secure and reliable!' },
+                    '交付': { zh: '订单确认后的交付流程：\n\n📅 完整时间线：\n• 订单确认后24小时内联系您\n• 3-5天完成设计优化\n• 生产周期约10-15天\n• 展会前7天完成搭建\n• 展会结束后2天内完成拆卸\n\n整个流程我们会保持密切沟通，确保按时交付！', en: 'Delivery process after order confirmation:\n\n📅 Complete timeline:\n• Contact within 24 hours\n• Design optimization in 3-5 days\n• Production takes 10-15 days\n• Installation 7 days before fair\n• Removal within 2 days after fair\n\nClose communication throughout!' },
+                    '修改': { zh: '订单修改政策：\n\n📝 可修改阶段：\n• 订单确认后24小时内 - 免费修改\n• 设计阶段 - 可调整细节\n• 生产前 - 允许重大调整\n• 生产后 - 仅限小幅修改\n\n建议在设计阶段确认所有细节，避免后期调整影响交付时间。', en: 'Order modification policy:\n\n📝 Modifiable stages:\n• Within 24 hours - Free modifications\n• Design stage - Detail adjustments allowed\n• Before production - Major changes possible\n• After production - Minor changes only\n\nConfirm all details during design stage!' },
+                    '售后': { zh: '我们提供全方位售后服务：\n\n🛠️ 售后保障：\n• 展期现场支持团队\n• 24小时应急热线\n• 免费维修服务\n• 展品调整协助\n• 拆卸清运保障\n\n如遇任何问题，我们1小时内响应，确保展会顺利进行！', en: 'Comprehensive after-sales service:\n\n🛠️ Support:\n• On-site support team during exhibition\n• 24-hour emergency hotline\n• Free repair service\n• Display adjustment assistance\n• Removal guarantee\n\n1-hour response time for any issues!' }
+                },
+                default: { zh: '您已完成所有配置步骤！\n\n✅ 最后确认：\n• 填写完整的企业信息\n• 选择支付方式\n• 同意服务条款\n• 提交订单\n\n有任何最后的问题，请随时问我！', en: 'You\'ve completed all configuration steps!\n\n✅ Final confirmation:\n• Complete company information\n• Select payment method\n• Agree to terms\n• Submit order\n\nAny final questions, ask me!' }
+            }
+        };
+
+        // 切换AI聊天界面
+        function toggleAIChat(stepId) {
+            const chatDiv = document.getElementById(stepId + '-chat');
+            const inputDiv = document.getElementById(stepId + '-input');
+            const quickDiv = document.getElementById(stepId + '-quick');
+            const summaryDiv = document.getElementById(stepId + '-summary');
+            
+            if (chatDiv.style.display === 'none') {
+                // 显示聊天界面
+                chatDiv.style.display = 'block';
+                inputDiv.style.display = 'flex';
+                quickDiv.style.display = 'flex';
+                summaryDiv.style.display = 'none';
+                
+                // 如果是第一次打开，添加欢迎消息
+                const messagesDiv = document.getElementById(stepId + '-messages');
+                if (messagesDiv.children.length === 0) {
+                    const welcomeMsg = getWelcomeMessage(stepId);
+                    addAIMessage(stepId, welcomeMsg, false);
+                }
+                
+                // 滚动到底部
+                setTimeout(() => chatDiv.scrollTop = chatDiv.scrollHeight, 100);
+            } else {
+                // 隐藏聊天界面
+                chatDiv.style.display = 'none';
+                inputDiv.style.display = 'none';
+                quickDiv.style.display = 'none';
+                summaryDiv.style.display = 'block';
+            }
+        }
+
+        // 获取欢迎消息
+        function getWelcomeMessage(stepId) {
+            const isEn = currentLanguage === 'en';
+            const responses = aiResponses[stepId];
+            return responses.default[isEn ? 'en' : 'zh'];
+        }
+
+        // 发送AI消息
+        function sendAIMessage(stepId) {
+            const inputField = document.getElementById(stepId + '-input-field');
+            const message = inputField.value.trim();
+            
+            if (!message) return;
+            
+            // 添加用户消息
+            addUserMessage(stepId, message);
+            
+            // 清空输入框
+            inputField.value = '';
+            
+            // 显示输入指示器
+            const typingDiv = document.getElementById(stepId + '-typing');
+            typingDiv.style.display = 'block';
+            
+            // 滚动到底部
+            const chatDiv = document.getElementById(stepId + '-chat');
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            
+            // 模拟AI思考，1.5秒后回复
+            setTimeout(() => {
+                typingDiv.style.display = 'none';
+                const response = getAIResponse(stepId, message);
+                addAIMessage(stepId, response, true);
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }, 1500);
+        }
+
+        // 快捷消息
+        function sendQuickMessage(stepId, message) {
+            const inputField = document.getElementById(stepId + '-input-field');
+            inputField.value = message;
+            sendAIMessage(stepId);
+        }
+
+        // 添加用户消息
+        function addUserMessage(stepId, message) {
+            const messagesDiv = document.getElementById(stepId + '-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'ai-message user';
+            messageDiv.innerHTML = `
+                <div class="ai-message-avatar">👤</div>
+                <div class="ai-message-content">${message}</div>
+            `;
+            messagesDiv.appendChild(messageDiv);
+        }
+
+        // 添加AI消息
+        function addAIMessage(stepId, message, animate) {
+            const messagesDiv = document.getElementById(stepId + '-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'ai-message assistant' + (animate ? ' fade-in-up' : '');
+            messageDiv.innerHTML = `
+                <div class="ai-message-avatar">🤖</div>
+                <div class="ai-message-content">${message.replace(/\n/g, '<br>')}</div>
+            `;
+            messagesDiv.appendChild(messageDiv);
+        }
+
+        // 获取AI响应
+        function getAIResponse(stepId, userMessage) {
+            const isEn = currentLanguage === 'en';
+            const responses = aiResponses[stepId];
+            
+            // 关键词匹配
+            for (const keyword in responses.keywords) {
+                if (userMessage.includes(keyword) || userMessage.toLowerCase().includes(keyword.toLowerCase())) {
+                    return responses.keywords[keyword][isEn ? 'en' : 'zh'];
+                }
+            }
+            
+            // 默认响应
+            return responses.default[isEn ? 'en' : 'zh'];
+        }
+
+        // 支持回车键发送
+        document.addEventListener('DOMContentLoaded', function() {
+            ['step1', 'step2', 'step3', 'step4'].forEach(stepId => {
+            // 确保滚动始终可用
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+                const inputField = document.getElementById(stepId + '-input-field');
+                if (inputField) {
+                    inputField.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            sendAIMessage(stepId);
+                        }
+                    });
+                }
+            });
+        });
+
+        // ====== 图片放大预览功能 ======
+        
+        function previewImage(imageSrc, caption) {
+            const modal = document.getElementById('image-preview-modal');
+            const modalImg = document.getElementById('preview-image');
+            const captionText = document.getElementById('preview-caption');
+            
+            modal.classList.add('show');
+            modalImg.src = imageSrc;
+            captionText.textContent = caption || '';
+            
+            // 防止背景滚动
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImagePreview() {
+            const modal = document.getElementById('image-preview-modal');
+            modal.classList.remove('show');
+            
+            // 恢复背景滚动
+            document.body.style.overflow = 'auto';
+        }
+        
+        // 点击模态框背景关闭
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('image-preview-modal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeImagePreview();
+                    }
+                });
+            }
+            
+            // ESC键关闭
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeImagePreview();
+                }
+            });
+            
+            // 更新悬浮聊天面板的步骤信息
+            updateFloatingChatStep(currentStep);
+        });
+
+        // ============= 嵌入式聊天面板功能 =============
+        let embeddedChatOpen = false;
+        
+        function toggleEmbeddedChat() {
+            console.log('toggleEmbeddedChat called, current state:', embeddedChatOpen);
+            const panel = document.getElementById('embedded-chat-panel');
+            console.log('Panel element:', panel);
+            
+            embeddedChatOpen = !embeddedChatOpen;
+            console.log('New state:', embeddedChatOpen);
+            
+            if (embeddedChatOpen) {
+                panel.classList.add('active');
+                console.log('Added active class to panel');
+                // 滚动到底部
+                setTimeout(() => {
+                    const body = document.getElementById('floating-chat-body');
+                    console.log('Chat body element:', body);
+                    if (body) {
+                        body.scrollTop = body.scrollHeight;
+                    }
+                    // 平滑滚动到聊天面板
+                    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            } else {
+                panel.classList.remove('active');
+                console.log('Removed active class from panel');
+            }
+        }
+
+        // 保留旧函数名以兼容
+        function toggleFloatingChat() {
+            toggleEmbeddedChat();
+        }
+        
+        function updateFloatingChatStep(step) {
+            const stepInfo = document.getElementById('chat-step-info');
+            const isEn = currentLanguage === 'en';
+            
+            const stepTexts = {
+                1: { zh: '第1步：选择展位模板', en: 'Step 1: Select Booth Template' },
+                2: { zh: '第2步：合规校验', en: 'Step 2: Compliance Check' },
+                3: { zh: '第3步：报价与BOM', en: 'Step 3: Quote & BOM' },
+                4: { zh: '第4步：确认提交', en: 'Step 4: Confirm & Submit' }
+            };
+            
+            const text = stepTexts[step] || stepTexts[1];
+            stepInfo.innerHTML = `<span class="zh">${text.zh}</span><span class="en">${text.en}</span>`;
+            
+            // 更新快捷按钮
+            updateFloatingQuickActions(step);
+        }
+        
+        function updateFloatingQuickActions(step) {
+            const quickActions = document.getElementById('floating-quick-actions');
+            const isEn = currentLanguage === 'en';
+            
+            const actionsByStep = {
+                1: [
+                    { zh: '介绍简洁绿色展位', en: 'About Green Booth', msg: '介绍一下简洁绿色展位' },
+                    { zh: '如何选尺寸？', en: 'Size Guide', msg: '如何选择合适的尺寸？' },
+                    { zh: '可复用率？', en: 'Reusability?', msg: '可复用率是什么意思？' }
+                ],
+                2: [
+                    { zh: '合规要求', en: 'Requirements', msg: '广交会有哪些合规要求？' },
+                    { zh: '材料标准', en: 'Materials', msg: '材料需要满足什么标准？' },
+                    { zh: '审核流程', en: 'Review Process', msg: '审核流程是怎样的？' }
+                ],
+                3: [
+                    { zh: '报价明细', en: 'Quote Details', msg: '报价包含哪些内容？' },
+                    { zh: '服务说明', en: 'Services', msg: '可选服务有哪些？' },
+                    { zh: '节省成本', en: 'Save Costs', msg: '如何节省成本？' }
+                ],
+                4: [
+                    { zh: '订单详情', en: 'Order Details', msg: '确认订单内容' },
+                    { zh: '交付时间', en: 'Delivery', msg: '交付时间是多久？' },
+                    { zh: '支付方式', en: 'Payment', msg: '支持哪些支付方式？' }
+                ]
+            };
+            
+            const actions = actionsByStep[step] || actionsByStep[1];
+            quickActions.innerHTML = actions.map(action => 
+                `<button class="floating-quick-btn" onclick="sendFloatingQuickMessage('${action.msg}')">
+                    <span class="zh">${action.zh}</span><span class="en">${action.en}</span>
+                </button>`
+            ).join('');
+        }
+        
+        function sendFloatingMessage() {
+            const input = document.getElementById('floating-chat-input');
+            const message = input ? input.value.trim() : '';
+            
+            console.log('sendFloatingMessage called', { input, message });
+            
+            if (!input) {
+                console.error('Input element not found!');
+                return;
+            }
+            
+            if (!message) {
+                console.log('Empty message, returning');
+                return;
+            }
+            
+            // 添加用户消息
+            addFloatingMessage('user', message);
+            input.value = '';
+            
+            // 显示输入中提示
+            const typingEl = document.getElementById('floating-typing');
+            if (typingEl) {
+                typingEl.style.display = 'block';
+            }
+            scrollFloatingChatToBottom();
+            
+            // 模拟AI回复
+            setTimeout(() => {
+                if (typingEl) {
+                    typingEl.style.display = 'none';
+                }
+                const reply = getFloatingAIReply(message, currentStep);
+                addFloatingMessage('assistant', reply);
+                scrollFloatingChatToBottom();
+            }, 1000 + Math.random() * 1000);
+        }
+        
+        function sendFloatingQuickMessage(message) {
+            console.log('sendFloatingQuickMessage called with:', message);
+            const input = document.getElementById('floating-chat-input');
+            if (input) {
+                input.value = message;
+                sendFloatingMessage();
+            } else {
+                console.error('Input element not found in sendFloatingQuickMessage!');
+            }
+        }
+        
+        function addFloatingMessage(role, content) {
+            console.log('addFloatingMessage called', { role, content });
+            const messagesContainer = document.getElementById('floating-chat-messages');
+            console.log('Messages container:', messagesContainer);
+            
+            if (!messagesContainer) {
+                console.error('Messages container not found!');
+                return;
+            }
+            
+            const isEn = currentLanguage === 'en';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `floating-chat-message ${role}`;
+            
+            const avatarIcon = role === 'assistant' ? 'bi-robot' : 'bi-person-fill';
+            
+            messageDiv.innerHTML = `
+                <div class="floating-message-avatar">
+                    <i class="bi ${avatarIcon}"></i>
+                </div>
+                <div class="floating-message-content">
+                    ${content.replace(/\n/g, '<br>')}
+                </div>
+            `;
+            
+            console.log('Appending message div:', messageDiv);
+            messagesContainer.appendChild(messageDiv);
+            console.log('Message appended. Total messages:', messagesContainer.children.length);
+        }
+        
+        function scrollFloatingChatToBottom() {
+            console.log('scrollFloatingChatToBottom called');
+            const body = document.getElementById('floating-chat-body');
+            console.log('Chat body element:', body);
+            
+            if (!body) {
+                console.error('Chat body not found!');
+                return;
+            }
+            
+            setTimeout(() => {
+                body.scrollTop = body.scrollHeight;
+                console.log('Scrolled to bottom:', body.scrollTop, '/', body.scrollHeight);
+            }, 100);
+        }
+        
+        function getFloatingAIReply(message, step) {
+            const isEn = currentLanguage === 'en';
+            message = message.toLowerCase();
+            
+            // 根据步骤和消息内容返回不同的回复
+            const replies = {
+                1: {
+                    '简洁绿色展位|绿色展位': {
+                        zh: '简洁绿色展位是我们最受欢迎的方案之一！\n\n✨ 主要特点：\n• 尺寸：6m × 3m，适合大多数展位\n• 材料：铝合金框架，轻便耐用\n• 可复用率：高达92%\n• 价格：¥12,000起\n\n这个方案特别适合注重环保和成本效益的展商。您想了解更多具体信息吗？',
+                        en: 'The Simple Green Booth is one of our most popular solutions!\n\n✨ Key Features:\n• Size: 6m × 3m, suitable for most booths\n• Material: Aluminum frame, lightweight and durable\n• Reusability: Up to 92%\n• Price: From ¥12,000\n\nThis solution is perfect for exhibitors who value sustainability and cost-effectiveness. Would you like to know more?'
+                    },
+                    '尺寸|选择尺寸|大小': {
+                        zh: '选择合适的尺寸很重要！建议考虑：\n\n📏 6m × 3m：\n• 适合小型展示\n• 预算友好\n• 适合2-3人团队\n\n📏 6m × 6m：\n• 中等规模展示\n• 更多展示空间\n• 适合4-6人团队\n\n您的展位号是多大？我可以帮您推荐最合适的方案。',
+                        en: 'Choosing the right size is important!\n\n📏 6m × 3m:\n• Suitable for small displays\n• Budget-friendly\n• Good for 2-3 person team\n\n📏 6m × 6m:\n• Medium-scale display\n• More exhibition space\n• Good for 4-6 person team\n\nWhat\'s your booth size? I can recommend the best solution.'
+                    },
+                    '可复用率|复用|重复使用': {
+                        zh: '可复用率是指展位材料在展会后可以重复使用的比例。\n\n♻️ 高可复用率的好处：\n• 降低长期成本\n• 减少浪费，更环保\n• 符合广交会绿色展会理念\n\n我们的方案可复用率在85%-92%之间，这意味着大部分材料都可以在下次展会继续使用！',
+                        en: 'Reusability rate refers to the percentage of booth materials that can be reused after the exhibition.\n\n♻️ Benefits of high reusability:\n• Lower long-term costs\n• Less waste, more eco-friendly\n• Aligns with Canton Fair green initiatives\n\nOur solutions have 85%-92% reusability, meaning most materials can be used again!'
+                    },
+                    'default': {
+                        zh: '我理解您的问题。关于模板选择，我建议：\n\n1️⃣ 先确定您的展位尺寸\n2️⃣ 考虑您的预算范围\n3️⃣ 想想您的品牌风格\n\n您可以点击下方的模板卡片查看详情，或者告诉我您的具体需求，我会为您推荐最合适的方案！',
+                        en: 'I understand your question. For template selection, I suggest:\n\n1️⃣ Confirm your booth size first\n2️⃣ Consider your budget range\n3️⃣ Think about your brand style\n\nClick the template cards below for details, or tell me your specific needs!'
+                    }
+                },
+                2: {
+                    '合规|要求|标准': {
+                        zh: '广交会对展位有严格的合规要求：\n\n✅ 必须满足：\n• 材料防火等级：B1级\n• 结构安全标准\n• 环保材料认证\n• 尺寸不超标\n\n我们的方案已经过预审，符合所有标准。您只需填写基本信息即可！',
+                        en: 'Canton Fair has strict compliance requirements:\n\n✅ Must meet:\n• Fire rating: B1 level\n• Structural safety standards\n• Eco-material certification\n• Size within limits\n\nOur solutions are pre-approved and meet all standards!'
+                    },
+                    'default': {
+                        zh: '关于合规问题，我们的系统会自动检查所有要求。您只需：\n\n1️⃣ 填写展位信息\n2️⃣ 确认材料选择\n3️⃣ 查看自动生成的合规报告\n\n有任何疑问，随时问我！',
+                        en: 'For compliance, our system automatically checks all requirements. You just need to:\n\n1️⃣ Fill in booth info\n2️⃣ Confirm material choices\n3️⃣ Review auto-generated report\n\nAsk me if you have questions!'
+                    }
+                },
+                3: {
+                    '报价|价格|费用': {
+                        zh: '报价包含以下内容：\n\n💰 基础报价：\n• 展位搭建材料\n• 基础施工服务\n• 标准照明\n\n💎 可选服务：\n• 多媒体设备\n• 品牌定制\n• 额外照明\n• 展后拆除回收\n\n您可以根据需求选择，系统会实时更新总价！',
+                        en: 'Quote includes:\n\n💰 Base Quote:\n• Booth materials\n• Basic construction\n• Standard lighting\n\n💎 Optional:\n• Multimedia equipment\n• Brand customization\n• Extra lighting\n• Post-event removal\n\nChoose as needed, price updates in real-time!'
+                    },
+                    'default': {
+                        zh: '关于报价，您可以：\n\n📊 查看材料清单(BOM)\n💡 选择可选服务\n💰 对比不同方案\n\n系统会自动计算总价，包括环保回收优惠。需要详细说明吗？',
+                        en: 'About pricing, you can:\n\n📊 View BOM\n💡 Select optional services\n💰 Compare solutions\n\nSystem calculates total automatically with eco-discount. Need details?'
+                    }
+                },
+                4: {
+                    'default': {
+                        zh: '您已到达最后一步！\n\n✅ 请确认：\n• 模板选择\n• 个性化设置\n• 可选服务\n• 总价\n\n确认无误后即可提交订单。有任何问题都可以问我！',
+                        en: 'You\'ve reached the final step!\n\n✅ Please confirm:\n• Template selection\n• Customization\n• Optional services\n• Total price\n\nSubmit when ready. Ask me anything!'
+                    }
+                }
+            };
+            
+            // 查找匹配的回复
+            const stepReplies = replies[step] || replies[1];
+            for (let key in stepReplies) {
+                if (key !== 'default') {
+                    const keywords = key.split('|');
+                    if (keywords.some(keyword => message.includes(keyword))) {
+                        return isEn ? stepReplies[key].en : stepReplies[key].zh;
+                    }
+                }
+            }
+            
+            return isEn ? stepReplies.default.en : stepReplies.default.zh;
+        }
+
+    </script>
+
+    <!-- 详情模态框 -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-template-name">模板名称</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <p id="modal-template-desc" style="color: #555; line-height: 1.6; margin-bottom: 20px;">模板描述</p>
+
+            <div class="modal-section">
+                <div class="modal-section-title"><i class="bi bi-info-circle"></i> <span class="zh">规格参数</span><span class="en show">Specifications</span></div>
+                <ul id="modal-specs-list" style="list-style: none; padding: 0; margin: 0;">
+                    <li style="padding: 6px 0;">规格加载中...</li>
+                </ul>
+            </div>
+
+            <div id="modal-optionals">
+                <!-- 可选服务动态生成 -->
+            </div>
+
+            <div class="modal-section" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span><span class="zh">基础价格：</span><span class="en show">Base Price:</span></span>
+                    <span style="font-weight: 700; color: #27ae60;" id="modal-base-price">¥18,000</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span><span class="zh">可选服务费用：</span><span class="en show">Add-ons Cost:</span></span>
+                    <span style="font-weight: 600; color: #e74c3c;" id="modal-optionals-cost">¥0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-top: 2px solid #ddd; padding-top: 10px; font-size: 16px;">
+                    <span style="font-weight: 700;"><span class="zh">合计：</span><span class="en show">Total:</span></span>
+                    <span style="font-weight: 700; color: #27ae60; font-size: 18px;" id="modal-total-price">¥18,000</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()"><span class="zh">取消</span><span class="en show">Cancel</span></button>
+                <button class="btn-primary" onclick="confirmModalSelection()"><span class="zh">确认选择</span><span class="en show">Confirm</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片放大预览浮窗 -->
+    <div id="image-preview-modal" class="image-preview-modal">
+        <div class="image-preview-content">
+            <button class="image-preview-close" onclick="closeImagePreview()" title="关闭浮窗 (ESC)">&times;</button>
+            <img id="preview-image" src="" alt="预览图片" style="cursor: default;">
+            <div id="preview-caption" class="image-preview-caption"></div>
+        </div>
+    </div>
+
+    </div> <!-- 结束 main-app -->
+
+
+
+</body>
+</html>
