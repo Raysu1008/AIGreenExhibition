@@ -2440,8 +2440,28 @@
                         </select>
                     </div>
                     <div class="custom-card" style="grid-column: span 2;">
-                        <div class="custom-title">自然语言调整（例如：主色偏绿色，整体更明亮，Logo居中）</div>
-                        <textarea id="prompt-text" rows="3" class="form-control" placeholder="请输入对效果图的期望描述"></textarea>
+                        <div class="custom-title">自然语言调整（AI 智能识别需求并生成对应效果图）</div>
+                        <textarea id="prompt-text" rows="4" class="form-control" placeholder="请输入对效果图的期望描述，例如：新增接待台、陈列台等"></textarea>
+                        
+                        <!-- 快捷提示词按钮 -->
+                        <div style="margin-top: 12px; margin-bottom: 12px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">💡 快捷提示词（点击自动填充）：</div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('基础场景')">
+                                    基础场景
+                                </button>
+                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('增加接待台')">
+                                    增加接待台
+                                </button>
+                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('增加陈列台')">
+                                    增加陈列台
+                                </button>
+                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('完整配置')">
+                                    接待台+陈列台
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="button-group" style="justify-content:flex-start;">
                             <button class="btn-custom btn-primary-custom" onclick="applyCustomization()">
                                 <i class="bi bi-magic"></i> <span class="zh">AI生成预览</span><span class="en show">AI Generate</span>
@@ -3528,6 +3548,75 @@
             return cfg;
         }
 
+        // 根据提示词内容匹配不同的场景图片
+        function matchScenarioImages(prompt) {
+            const p = (prompt || '').toLowerCase();
+            
+            // 定义场景关键词映射
+            const scenarios = {
+                'base': { // 基础场景（Gemini_1: 基础展位）
+                    keywords: ['基础', '原始', '简单', '基本'],
+                    images: [
+                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png'
+                    ],
+                    titles: ['基础展位方案']
+                },
+                'reception': { // 增加接待台（Gemini_2: 带接待台）
+                    keywords: ['接待台', '接待区', '接待', '前台', 'reception'],
+                    images: [
+                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png'
+                    ],
+                    titles: ['增加接待台方案']
+                },
+                'display': { // 增加陈列台（Gemini_3: 带陈列台）
+                    keywords: ['陈列台', '陈列', '展示台', '展示柜', 'display'],
+                    images: [
+                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+                    ],
+                    titles: ['增加陈列台方案']
+                },
+                'full': { // 完整配置（接待台+陈列台）
+                    keywords: ['完整', '所有', '全部', '接待台.*陈列台', '陈列台.*接待台'],
+                    images: [
+                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
+                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+                    ],
+                    titles: ['接待台方案', '陈列台方案']
+                }
+            };
+
+            // 匹配提示词
+            for (const [scenarioType, config] of Object.entries(scenarios)) {
+                for (const keyword of config.keywords) {
+                    if (p.includes(keyword) || new RegExp(keyword).test(p)) {
+                        console.log(`匹配到场景: ${scenarioType}, 关键词: ${keyword}`);
+                        return config;
+                    }
+                }
+            }
+
+            // 默认返回所有三张图片
+            return {
+                images: [
+                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
+                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
+                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+                ],
+                titles: ['方案一', '方案二', '方案三']
+            };
+        }
+
+        // 填充快捷提示词
+        function fillPrompt(type) {
+            const prompts = {
+                '基础场景': '展示基础展位方案',
+                '增加接待台': '在不改变原有场景结构的前提下，新增一个接待台（位于展位前侧，便于接待观众），要求：风格、材质、颜色与整体展会环境统一。',
+                '增加陈列台': '在不改变原有场景结构的前提下，新增一个长方形、低矮的陈列台（高度低于接待台，造型简洁），要求：风格、材质、颜色与整体展会环境统一。',
+                '完整配置': '在不改变原有场景结构的前提下：\n1. 新增一个接待台（位于展位前侧，便于接待观众）\n2. 新增一个长方形、低矮的陈列台（高度低于接待台，造型简洁）\n要求：风格、材质、颜色与整体展会环境统一。'
+            };
+            document.getElementById('prompt-text').value = prompts[type] || '';
+        }
+
         async function applyCustomization() {
             // 显示加载动画
             const btnEle = event.target;
@@ -3535,21 +3624,22 @@
             btnEle.disabled = true;
             btnEle.innerHTML = '<span class="loading-spinner"></span>' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
 
-            // 使用实际的 AI 生成图片（Gemini）
-            const geminiImages = [
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
-            ];
+            // 获取用户输入的提示词
+            const prompt = document.getElementById('prompt-text').value;
+            console.log('用户提示词:', prompt);
+
+            // 根据提示词匹配场景图片
+            const scenario = matchScenarioImages(prompt);
+            const imagesToShow = scenario.images;
+            const imageTitles = scenario.titles;
+
+            console.log('将显示图片数量:', imagesToShow.length);
+            console.log('图片标题:', imageTitles);
 
             const canvases = [frontCanvas, leftCanvas, rightCanvas];
-            const titles = [
-                currentLanguage === 'en' ? 'Front View' : '正面预览',
-                currentLanguage === 'en' ? 'Left View' : '左侧视角',
-                currentLanguage === 'en' ? 'Right View' : '右侧视角'
-            ];
 
-            // 在 canvas 上显示 Gemini 图片
+            // 在 canvas 上显示对应场景的图片
+            // 如果只有1张图片，显示在第一个canvas；如果有2张，显示在前两个；如果有3张，全部显示
             for (let idx = 0; idx < canvases.length; idx++) {
                 const canvas = canvases[idx];
                 const ctx = canvas.getContext('2d');
@@ -3557,48 +3647,59 @@
                 const h = canvas.height = canvas.clientHeight;
                 ctx.clearRect(0, 0, w, h);
 
-                // 加载并显示 Gemini 图片
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                await new Promise((resolve) => {
-                    img.onload = () => {
-                        // 计算适配尺寸
-                        const scale = Math.min(w / img.width, h / img.height);
-                        const dw = img.width * scale;
-                        const dh = img.height * scale;
-                        const x = (w - dw) / 2;
-                        const y = (h - dh) / 2;
-                        
-                        // 绘制图片
-                        ctx.drawImage(img, x, y, dw, dh);
-                        
-                        // 添加标题
-                        ctx.fillStyle = '#7c3aed';
-                        ctx.font = 'bold 14px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.globalAlpha = 0.9;
-                        ctx.fillText(titles[idx], w/2, 25);
-                        ctx.globalAlpha = 1.0;
-                        
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        // 如果加载失败，显示占位符
-                        ctx.fillStyle = '#f8f9fa';
-                        ctx.fillRect(0, 0, w, h);
-                        ctx.fillStyle = '#7f8c8d';
-                        ctx.font = '14px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('加载中...', w/2, h/2);
-                        resolve();
-                    };
-                    img.src = geminiImages[idx];
-                });
+                if (idx < imagesToShow.length) {
+                    // 加载并显示对应的图片
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    await new Promise((resolve) => {
+                        img.onload = () => {
+                            // 计算适配尺寸
+                            const scale = Math.min(w / img.width, h / img.height);
+                            const dw = img.width * scale;
+                            const dh = img.height * scale;
+                            const x = (w - dw) / 2;
+                            const y = (h - dh) / 2;
+                            
+                            // 绘制图片
+                            ctx.drawImage(img, x, y, dw, dh);
+                            
+                            // 添加标题
+                            ctx.fillStyle = '#7c3aed';
+                            ctx.font = 'bold 14px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.globalAlpha = 0.9;
+                            const title = imageTitles[idx] || `方案${idx + 1}`;
+                            ctx.fillText(title, w/2, 25);
+                            ctx.globalAlpha = 1.0;
+                            
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            // 如果加载失败，显示占位符
+                            ctx.fillStyle = '#f8f9fa';
+                            ctx.fillRect(0, 0, w, h);
+                            ctx.fillStyle = '#7f8c8d';
+                            ctx.font = '14px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('加载中...', w/2, h/2);
+                            resolve();
+                        };
+                        img.src = imagesToShow[idx];
+                    });
+                } else {
+                    // 如果图片数量少于3张，其余canvas显示为空白
+                    ctx.fillStyle = '#f8f9fa';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.fillStyle = '#bdc3c7';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('暂无预览', w/2, h/2);
+                }
             }
 
-            // 显示第一张 Gemini 图片作为主效果图
+            // 显示第一张图片作为主效果图
             const aiOutputImg = document.getElementById('ai-output-image');
-            aiOutputImg.src = geminiImages[0];
+            aiOutputImg.src = imagesToShow[0];
             document.getElementById('ai-output-section').style.display = 'block';
 
             // 恢复按钮状态
@@ -3611,7 +3712,7 @@
             const primary = document.getElementById('color-primary').value;
             const secondary = document.getElementById('color-secondary').value;
             const positionSel = document.getElementById('logo-position').value;
-            const prompt = document.getElementById('prompt-text').value;
+            const userPrompt = document.getElementById('prompt-text').value;
             
             customizationLogs.push({
                 time: new Date().toISOString(),
@@ -3620,8 +3721,9 @@
                 colors: { primary, secondary },
                 logo: !!document.getElementById('logo-upload').files[0],
                 position: positionSel,
-                prompt,
-                geminiImages: geminiImages
+                prompt: userPrompt,
+                generatedImages: imagesToShow,
+                matchedScenario: scenario
             });
         }
 
