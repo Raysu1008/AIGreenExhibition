@@ -2597,7 +2597,7 @@
                         </div>
                         
                         <div class="button-group" style="justify-content:flex-start;">
-                            <button class="btn-custom btn-primary-custom" onclick="applyCustomization()">
+                            <button class="btn-custom btn-primary-custom" onclick="applyCustomization(event)">
                                 <i class="bi bi-magic"></i> <span class="zh">AI生成预览</span><span class="en show">AI Generate</span>
                             </button>
                             <button class="btn-custom btn-secondary-custom" onclick="saveSnapshot()">
@@ -3897,12 +3897,12 @@
             reader.readAsDataURL(file);
         }
 
-        async function applyCustomization() {
+        async function applyCustomization(event) {
             // 显示加载动画
-            const btnEle = event.target;
+            const btnEle = event ? event.target : document.querySelector('button[onclick*="applyCustomization"]');
             const originalText = btnEle.innerHTML;
             btnEle.disabled = true;
-            btnEle.innerHTML = '<span class="loading-spinner"></span>' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
+            btnEle.innerHTML = '<span class="loading-spinner"></span> ' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
 
             // 获取用户输入的提示词
             const prompt = document.getElementById('prompt-text').value;
@@ -3968,8 +3968,17 @@
 
             // 显示第一张图片作为主效果图
             const aiOutputImg = document.getElementById('ai-output-image');
-            aiOutputImg.src = imagesToShow[0];
-            document.getElementById('ai-output-section').style.display = 'block';
+            if (aiOutputImg && imagesToShow.length > 0) {
+                aiOutputImg.src = imagesToShow[0];
+                const aiOutputSection = document.getElementById('ai-output-section');
+                if (aiOutputSection) {
+                    aiOutputSection.style.display = 'block';
+                    // 滚动到AI输出区域
+                    setTimeout(() => {
+                        aiOutputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+            }
 
             // 恢复按钮状态
             setTimeout(() => {
