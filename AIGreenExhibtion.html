@@ -2406,43 +2406,10 @@
 
             <div class="section-title" style="margin-top: 30px; border-left: 4px solid #27ae60;"><span class="zh">绿色环保方案库</span><span class="en show">Green Solution Library</span></div>
             <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 15px;">
-                <span class="zh">💡 提示：选择尺寸或风格可自动筛选 | 点击图片可放大预览</span>
-                <span class="en show">💡 Tip: Select size or style to auto-filter | Click image to preview</span>
+                <span class="zh">💡 提示：选择尺寸或风格可自动筛选 | 点击图片可放大预览 | 共45个环保展位方案</span>
+                <span class="en show">💡 Tip: Select size or style to auto-filter | Click image to preview | 45 green booth solutions</span>
             </p>
-            <div class="template-grid" id="template-gallery">
-                <div class="template-card" data-size="18" data-style="modern" onclick="selectTemplate(this, 'T001', '简洁绿色展位'); openModal('T001')">
-                    <img class="template-image clickable-image" id="template-image-1" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png', '简洁绿色展位 - 18㎡ (6m × 3m)')">
-                    <div class="template-title">简洁绿色展位</div>
-                    <div class="template-spec">
-                        <div><strong>18㎡</strong> (6m × 3m)</div>
-                        <div>风格: 现代简约</div>
-                        <div>材料: 铝合金框架</div>
-                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 92%</div>
-                    </div>
-                </div>
-
-                <div class="template-card" data-size="36" data-style="nature" onclick="selectTemplate(this, 'T002', '生态互动展位'); openModal('T002')">
-                    <img class="template-image clickable-image" id="template-image-2" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png', '生态互动展位 - 36㎡ (6m × 6m)')">
-                    <div class="template-title">生态互动展位</div>
-                    <div class="template-spec">
-                        <div><strong>36㎡</strong> (6m × 6m)</div>
-                        <div>风格: 自然环保</div>
-                        <div>材料: 木质框架</div>
-                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 88%</div>
-                    </div>
-                </div>
-
-                <div class="template-card" data-size="36" data-style="premium" onclick="selectTemplate(this, 'T003', '高端品牌展位'); openModal('T003')">
-                    <img class="template-image clickable-image" id="template-image-3" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png', '高端品牌展位 - 36㎡ (6m × 6m)')">
-                    <div class="template-title">高端品牌展位</div>
-                    <div class="template-spec">
-                        <div><strong>36㎡</strong> (6m × 6m)</div>
-                        <div>风格: 高端品牌</div>
-                        <div>材料: 铝合金+木质</div>
-                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 85%</div>
-                    </div>
-                </div>
-            </div>
+            <div class="template-grid" id="template-gallery"></div>
 
             <!-- 个性化与AI生成预览 -->
             <div class="toggle-section" onclick="toggleSection('custom-section')" style="margin-top: 20px;">
@@ -3433,7 +3400,112 @@
             const templateStyleEl = document.getElementById('template-style');
             if (templateSizeEl) templateSizeEl.addEventListener('change', updateStep1Assistant);
             if (templateStyleEl) templateStyleEl.addEventListener('change', updateStep1Assistant);
+            
+            // 动态生成45个展位卡片
+            loadBoothTemplates();
         });
+        
+        // 动态加载展位卡片
+        function loadBoothTemplates() {
+            const gallery = document.getElementById('template-gallery');
+            if (!gallery) return;
+            
+            // 展位数据配置
+            const booths = [];
+            const styles = ['nature', 'tech', 'premium', 'modern'];
+            const styleNames = ['自然环保', '科技智能', '高端品牌', '现代简约'];
+            const sizes = [
+                { sqm: 18, dim: '6m × 3m', count: 15, start: 1 },
+                { sqm: 27, dim: '9m × 3m', count: 15, start: 16 },
+                { sqm: 36, dim: '6m × 6m', count: 15, start: 31 }
+            ];
+            
+            // 生成45个展位配置
+            sizes.forEach(sizeConfig => {
+                for (let i = 0; i < sizeConfig.count; i++) {
+                    const pageNum = sizeConfig.start + i;
+                    const boothNum = pageNum;
+                    const styleIndex = i % 4;
+                    const reusability = 85 + (i % 8);
+                    
+                    booths.push({
+                        id: `T${String(boothNum).padStart(3, '0')}`,
+                        name: `环保展位方案 ${boothNum}`,
+                        size: sizeConfig.sqm,
+                        dim: sizeConfig.dim,
+                        style: styles[styleIndex],
+                        styleName: styleNames[styleIndex],
+                        reusability: reusability,
+                        image: `https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/展位方案集/page_${String(pageNum).padStart(3, '0')}.png`
+                    });
+                }
+            });
+            
+            // 保留原有的3个展位
+            const originalBooths = [
+                {
+                    id: 'T001',
+                    name: '简洁绿色展位',
+                    size: 18,
+                    dim: '6m × 3m',
+                    style: 'modern',
+                    styleName: '现代简约',
+                    reusability: 92,
+                    image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png'
+                },
+                {
+                    id: 'T002',
+                    name: '生态互动展位',
+                    size: 36,
+                    dim: '6m × 6m',
+                    style: 'nature',
+                    styleName: '自然环保',
+                    reusability: 88,
+                    image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png'
+                },
+                {
+                    id: 'T003',
+                    name: '高端品牌展位',
+                    size: 36,
+                    dim: '6m × 6m',
+                    style: 'premium',
+                    styleName: '高端品牌',
+                    reusability: 85,
+                    image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png'
+                }
+            ];
+            
+            // 合并所有展位（原有3个 + 新增45个）
+            const allBooths = [...originalBooths, ...booths];
+            
+            // 生成HTML
+            allBooths.forEach(booth => {
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                card.setAttribute('data-size', booth.size);
+                card.setAttribute('data-style', booth.style);
+                card.onclick = function() {
+                    selectTemplate(this, booth.id, booth.name);
+                    openModal(booth.id);
+                };
+                
+                card.innerHTML = `
+                    <img class="template-image clickable-image" 
+                         src="${booth.image}" 
+                         alt="${booth.name}"
+                         onclick="event.stopPropagation(); previewImage('${booth.image}', '${booth.name} - ${booth.size}㎡ (${booth.dim})')">
+                    <div class="template-title">${booth.name}</div>
+                    <div class="template-spec">
+                        <div><strong>${booth.size}㎡</strong> (${booth.dim})</div>
+                        <div>风格: ${booth.styleName}</div>
+                        <div>材料: 环保材料</div>
+                        <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: ${booth.reusability}%</div>
+                    </div>
+                `;
+                
+                gallery.appendChild(card);
+            });
+        }
 
         // 模板选择会自动更新 currentScenario，无需显式切换
 
