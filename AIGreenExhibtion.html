@@ -3441,10 +3441,10 @@
                 }
             });
             
-            // 保留原有的3个展位
+            // 保留原有的3个展位（改为T046-T048避免冲突）
             const originalBooths = [
                 {
-                    id: 'T001',
+                    id: 'T046',
                     name: '简洁绿色展位',
                     size: 18,
                     dim: '6m × 3m',
@@ -3454,7 +3454,7 @@
                     image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png'
                 },
                 {
-                    id: 'T002',
+                    id: 'T047',
                     name: '生态互动展位',
                     size: 36,
                     dim: '6m × 6m',
@@ -3464,7 +3464,7 @@
                     image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png'
                 },
                 {
-                    id: 'T003',
+                    id: 'T048',
                     name: '高端品牌展位',
                     size: 36,
                     dim: '6m × 6m',
@@ -3475,8 +3475,8 @@
                 }
             ];
             
-            // 合并所有展位（原有3个 + 新增45个）
-            const allBooths = [...originalBooths, ...booths];
+            // 合并所有展位（PDF的45个 + 原有3个 = 48个）
+            const allBooths = [...booths, ...originalBooths];
             
             // 生成HTML
             allBooths.forEach(booth => {
