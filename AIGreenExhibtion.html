@@ -2420,44 +2420,82 @@
             <div id="custom-section" class="hidden">
                 <div class="custom-grid">
                     <div class="custom-card">
-                        <div class="custom-title">品牌主色</div>
-                        <input type="color" id="color-primary" value="#27ae60" class="form-control">
-                        <div style="height:8px"></div>
-                        <div class="custom-title">品牌次色</div>
-                        <input type="color" id="color-secondary" value="#2c3e50" class="form-control">
+                        <div class="custom-title">Logo上传</div>
+                        <input type="file" id="logo-upload" accept="image/*" class="form-control" onchange="syncLogoColors()">
+                        <div style="margin-top: 8px; font-size: 11px; color: #666;">
+                            <i class="bi bi-info-circle"></i> Logo颜色将自动用于配色建议
+                        </div>
                     </div>
                     <div class="custom-card">
-                        <div class="custom-title">Logo上传</div>
-                        <input type="file" id="logo-upload" accept="image/*" class="form-control">
-                        <div style="height:8px"></div>
-                        <div class="custom-title">Logo位置</div>
-                        <select id="logo-position" class="form-control">
-                            <option value="center">居中</option>
-                            <option value="top-left">左上</option>
-                            <option value="top-right">右上</option>
-                            <option value="bottom-left">左下</option>
-                            <option value="bottom-right">右下</option>
+                        <div class="custom-title">展台配色（基于Logo颜色）</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 11px; color: #666;">主色</label>
+                                <input type="color" id="color-primary" value="#27ae60" class="form-control">
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; color: #666;">辅色</label>
+                                <input type="color" id="color-secondary" value="#2c3e50" class="form-control">
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 11px; color: #666;">
+                            <i class="bi bi-lightbulb"></i> 上传Logo后自动匹配配色方案
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <div class="custom-title">照明配置</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div>
+                                <label style="font-size: 11px; color: #666;">射灯数量</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button class="btn-custom btn-secondary-custom" style="padding: 4px 10px; font-size: 14px;" onclick="adjustLighting('spotlight', -1)">-</button>
+                                    <input type="number" id="spotlight-count" value="4" min="0" max="12" class="form-control" style="text-align: center;">
+                                    <button class="btn-custom btn-secondary-custom" style="padding: 4px 10px; font-size: 14px;" onclick="adjustLighting('spotlight', 1)">+</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size: 11px; color: #666;">白灯数量</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <button class="btn-custom btn-secondary-custom" style="padding: 4px 10px; font-size: 14px;" onclick="adjustLighting('whitelight', -1)">-</button>
+                                    <input type="number" id="whitelight-count" value="2" min="0" max="12" class="form-control" style="text-align: center;">
+                                    <button class="btn-custom btn-secondary-custom" style="padding: 4px 10px; font-size: 14px;" onclick="adjustLighting('whitelight', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 11px; color: #666;">
+                            <i class="bi bi-info-circle"></i> 基础方案：4个射灯 + 2个白灯
+                        </div>
+                    </div>
+                    <div class="custom-card">
+                        <div class="custom-title">材料等级</div>
+                        <select id="material-grade" class="form-control">
+                            <option value="B1" selected>B1级防火材料（标准）</option>
+                            <option value="A">A级防火材料（高级）</option>
+                            <option value="B2">B2级材料（基础）</option>
                         </select>
+                        <div style="margin-top: 8px; font-size: 11px; color: #27ae60;">
+                            <i class="bi bi-shield-check"></i> 推荐使用B1级以上防火材料
+                        </div>
                     </div>
                     <div class="custom-card" style="grid-column: span 2;">
-                        <div class="custom-title">自然语言调整（AI 智能识别需求并生成对应效果图）</div>
-                        <textarea id="prompt-text" rows="4" class="form-control" placeholder="请输入对效果图的期望描述，例如：新增接待台、陈列台等"></textarea>
+                        <div class="custom-title">个性化定制服务（自然语言描述）</div>
+                        <textarea id="prompt-text" rows="4" class="form-control" placeholder="请输入您的定制需求，例如：新增接待台、陈列台、调整照明等"></textarea>
                         
-                        <!-- 快捷提示词按钮 -->
+                        <!-- 快捷服务选项 -->
                         <div style="margin-top: 12px; margin-bottom: 12px;">
-                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">💡 快捷提示词（点击自动填充）：</div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">💡 快捷定制选项（点击自动填充）：</div>
                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('基础场景')">
-                                    基础场景
-                                </button>
                                 <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('增加接待台')">
-                                    增加接待台
+                                    + 增加接待台
                                 </button>
                                 <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('增加陈列台')">
-                                    增加陈列台
+                                    + 增加陈列台
                                 </button>
                                 <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('完整配置')">
                                     接待台+陈列台
+                                </button>
+                                <button class="btn-custom btn-secondary-custom" style="font-size: 11px; padding: 6px 12px;" onclick="fillPrompt('调整照明')">
+                                    调整照明
                                 </button>
                             </div>
                         </div>
@@ -3548,73 +3586,110 @@
             return cfg;
         }
 
-        // 根据提示词内容匹配不同的场景图片
+        // 根据提示词内容匹配不同的场景图片（始终返回3张图片）
         function matchScenarioImages(prompt) {
             const p = (prompt || '').toLowerCase();
             
-            // 定义场景关键词映射
-            const scenarios = {
-                'base': { // 基础场景（Gemini_1: 基础展位）
-                    keywords: ['基础', '原始', '简单', '基本'],
-                    images: [
-                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png'
-                    ],
-                    titles: ['基础展位方案']
-                },
-                'reception': { // 增加接待台（Gemini_2: 带接待台）
-                    keywords: ['接待台', '接待区', '接待', '前台', 'reception'],
-                    images: [
-                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png'
-                    ],
-                    titles: ['增加接待台方案']
-                },
-                'display': { // 增加陈列台（Gemini_3: 带陈列台）
-                    keywords: ['陈列台', '陈列', '展示台', '展示柜', 'display'],
-                    images: [
-                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
-                    ],
-                    titles: ['增加陈列台方案']
-                },
-                'full': { // 完整配置（接待台+陈列台）
-                    keywords: ['完整', '所有', '全部', '接待台.*陈列台', '陈列台.*接待台'],
-                    images: [
-                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
-                        'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
-                    ],
-                    titles: ['接待台方案', '陈列台方案']
-                }
-            };
-
-            // 匹配提示词
-            for (const [scenarioType, config] of Object.entries(scenarios)) {
-                for (const keyword of config.keywords) {
-                    if (p.includes(keyword) || new RegExp(keyword).test(p)) {
-                        console.log(`匹配到场景: ${scenarioType}, 关键词: ${keyword}`);
-                        return config;
-                    }
-                }
+            // 三张基础图片（始终显示所有三张）
+            const allImages = [
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+            ];
+            
+            // 根据提示词匹配标题
+            let titles = ['基础方案', '接待台方案', '陈列台方案'];
+            
+            if (p.includes('接待台') && p.includes('陈列台')) {
+                titles = ['基础展位', '带接待台效果', '带陈列台效果'];
+            } else if (p.includes('接待台')) {
+                titles = ['原始方案', '接待台方案（推荐）', '可选陈列台方案'];
+            } else if (p.includes('陈列台')) {
+                titles = ['原始方案', '可选接待台方案', '陈列台方案（推荐）'];
+            } else if (p.includes('照明') || p.includes('灯光')) {
+                titles = ['标准照明', '增强照明方案A', '增强照明方案B'];
             }
-
-            // 默认返回所有三张图片
+            
+            console.log('AI生成: 始终输出3张效果图');
+            console.log('图片标题:', titles);
+            
+            // 始终返回所有三张图片
             return {
-                images: [
-                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
-                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
-                    'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
-                ],
-                titles: ['方案一', '方案二', '方案三']
+                images: allImages,
+                titles: titles
             };
         }
 
         // 填充快捷提示词
         function fillPrompt(type) {
             const prompts = {
-                '基础场景': '展示基础展位方案',
                 '增加接待台': '在不改变原有场景结构的前提下，新增一个接待台（位于展位前侧，便于接待观众），要求：风格、材质、颜色与整体展会环境统一。',
                 '增加陈列台': '在不改变原有场景结构的前提下，新增一个长方形、低矮的陈列台（高度低于接待台，造型简洁），要求：风格、材质、颜色与整体展会环境统一。',
-                '完整配置': '在不改变原有场景结构的前提下：\n1. 新增一个接待台（位于展位前侧，便于接待观众）\n2. 新增一个长方形、低矮的陈列台（高度低于接待台，造型简洁）\n要求：风格、材质、颜色与整体展会环境统一。'
+                '完整配置': '在不改变原有场景结构的前提下：\n1. 新增一个接待台（位于展位前侧，便于接待观众）\n2. 新增一个长方形、低矮的陈列台（高度低于接待台，造型简洁）\n要求：风格、材质、颜色与整体展会环境统一。',
+                '调整照明': '请根据当前照明配置（射灯 ' + document.getElementById('spotlight-count').value + ' 个，白灯 ' + document.getElementById('whitelight-count').value + ' 个），生成优化后的照明效果方案。'
             };
             document.getElementById('prompt-text').value = prompts[type] || '';
+        }
+        
+        // 调整照明数量
+        function adjustLighting(type, delta) {
+            const inputId = type === 'spotlight' ? 'spotlight-count' : 'whitelight-count';
+            const input = document.getElementById(inputId);
+            const currentValue = parseInt(input.value) || 0;
+            const newValue = Math.max(0, Math.min(12, currentValue + delta));
+            input.value = newValue;
+            console.log(`${type} 调整为: ${newValue}`);
+        }
+        
+        // Logo颜色同步到配色方案
+        function syncLogoColors() {
+            const file = document.getElementById('logo-upload').files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    // 创建临时canvas提取主色
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // 简单提取中心区域的颜色作为主色
+                    const centerX = Math.floor(img.width / 2);
+                    const centerY = Math.floor(img.height / 2);
+                    const imageData = ctx.getImageData(centerX - 10, centerY - 10, 20, 20);
+                    const data = imageData.data;
+                    
+                    // 计算平均颜色
+                    let r = 0, g = 0, b = 0, count = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                        r += data[i];
+                        g += data[i + 1];
+                        b += data[i + 2];
+                        count++;
+                    }
+                    r = Math.floor(r / count);
+                    g = Math.floor(g / count);
+                    b = Math.floor(b / count);
+                    
+                    // 转换为hex格式
+                    const primaryColor = '#' + [r, g, b].map(x => {
+                        const hex = x.toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                    }).join('');
+                    
+                    // 设置主色
+                    document.getElementById('color-primary').value = primaryColor;
+                    
+                    console.log('Logo主色已提取:', primaryColor);
+                    alert('已根据Logo自动提取配色方案！主色: ' + primaryColor);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         async function applyCustomization() {
@@ -3638,8 +3713,7 @@
 
             const canvases = [frontCanvas, leftCanvas, rightCanvas];
 
-            // 在 canvas 上显示对应场景的图片
-            // 如果只有1张图片，显示在第一个canvas；如果有2张，显示在前两个；如果有3张，全部显示
+            // 在 canvas 上显示所有三张图片
             for (let idx = 0; idx < canvases.length; idx++) {
                 const canvas = canvases[idx];
                 const ctx = canvas.getContext('2d');
@@ -3647,54 +3721,44 @@
                 const h = canvas.height = canvas.clientHeight;
                 ctx.clearRect(0, 0, w, h);
 
-                if (idx < imagesToShow.length) {
-                    // 加载并显示对应的图片
-                    const img = new Image();
-                    img.crossOrigin = 'anonymous';
-                    await new Promise((resolve) => {
-                        img.onload = () => {
-                            // 计算适配尺寸
-                            const scale = Math.min(w / img.width, h / img.height);
-                            const dw = img.width * scale;
-                            const dh = img.height * scale;
-                            const x = (w - dw) / 2;
-                            const y = (h - dh) / 2;
-                            
-                            // 绘制图片
-                            ctx.drawImage(img, x, y, dw, dh);
-                            
-                            // 添加标题
-                            ctx.fillStyle = '#7c3aed';
-                            ctx.font = 'bold 14px sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.globalAlpha = 0.9;
-                            const title = imageTitles[idx] || `方案${idx + 1}`;
-                            ctx.fillText(title, w/2, 25);
-                            ctx.globalAlpha = 1.0;
-                            
-                            resolve();
-                        };
-                        img.onerror = () => {
-                            // 如果加载失败，显示占位符
-                            ctx.fillStyle = '#f8f9fa';
-                            ctx.fillRect(0, 0, w, h);
-                            ctx.fillStyle = '#7f8c8d';
-                            ctx.font = '14px sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.fillText('加载中...', w/2, h/2);
-                            resolve();
-                        };
-                        img.src = imagesToShow[idx];
-                    });
-                } else {
-                    // 如果图片数量少于3张，其余canvas显示为空白
-                    ctx.fillStyle = '#f8f9fa';
-                    ctx.fillRect(0, 0, w, h);
-                    ctx.fillStyle = '#bdc3c7';
-                    ctx.font = '14px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('暂无预览', w/2, h/2);
-                }
+                // 始终显示三张图片
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        // 计算适配尺寸
+                        const scale = Math.min(w / img.width, h / img.height);
+                        const dw = img.width * scale;
+                        const dh = img.height * scale;
+                        const x = (w - dw) / 2;
+                        const y = (h - dh) / 2;
+                        
+                        // 绘制图片
+                        ctx.drawImage(img, x, y, dw, dh);
+                        
+                        // 添加标题
+                        ctx.fillStyle = '#7c3aed';
+                        ctx.font = 'bold 14px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.globalAlpha = 0.9;
+                        const title = imageTitles[idx] || `方案${idx + 1}`;
+                        ctx.fillText(title, w/2, 25);
+                        ctx.globalAlpha = 1.0;
+                        
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        // 如果加载失败，显示占位符
+                        ctx.fillStyle = '#f8f9fa';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.fillStyle = '#7f8c8d';
+                        ctx.font = '14px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('加载中...', w/2, h/2);
+                        resolve();
+                    };
+                    img.src = imagesToShow[idx];
+                });
             }
 
             // 显示第一张图片作为主效果图
@@ -3707,12 +3771,14 @@
                 btnEle.disabled = false;
                 btnEle.innerHTML = originalText;
             }, 1500);
-
+            
             // log customization
             const primary = document.getElementById('color-primary').value;
             const secondary = document.getElementById('color-secondary').value;
-            const positionSel = document.getElementById('logo-position').value;
             const userPrompt = document.getElementById('prompt-text').value;
+            const spotlightCount = document.getElementById('spotlight-count').value;
+            const whitelightCount = document.getElementById('whitelight-count').value;
+            const materialGrade = document.getElementById('material-grade').value;
             
             customizationLogs.push({
                 time: new Date().toISOString(),
@@ -3720,7 +3786,8 @@
                 scenario: currentScenario,
                 colors: { primary, secondary },
                 logo: !!document.getElementById('logo-upload').files[0],
-                position: positionSel,
+                lighting: { spotlight: spotlightCount, whitelight: whitelightCount },
+                material: materialGrade,
                 prompt: userPrompt,
                 generatedImages: imagesToShow,
                 matchedScenario: scenario
@@ -4045,7 +4112,7 @@
             step3: {
                 keywords: {
                     '服务费': { zh: '报价包含两项服务费：\n\n💼 运营服务费 (7%)：\n• 专业团队现场管理\n• 搭建质量监督\n• 问题应急处理\n• 展期维护服务\n\n⚙️ 平台技术费 (3%)：\n• 在线自助系统维护\n• AI设计工具支持\n• 订单管理系统\n• 客户服务平台\n\n这些费用确保您获得全方位的专业服务！', en: 'The quote includes two service fees:\n\n💼 Operation Fee (7%):\n• Professional on-site management\n• Quality supervision\n• Emergency handling\n• Maintenance during exhibition\n\n⚙️ Platform Fee (3%):\n• Self-service system maintenance\n• AI design tool support\n• Order management\n• Customer service platform' },
-                    '增值': { zh: '我推荐以下增值服务：\n\n🌟 提升专业度：\n• 强化LED照明 (+¥1,200) - 让展品更显眼\n• 定制品牌装饰 (+¥1,800) - 强化品牌形象\n\n🛡️ 保障服务：\n• 24小时在线支持 (+¥800) - 随时解决问题\n• 现场快速响应 (+¥600) - 1小时内到场\n\n根据您的预算和需求，可以灵活选择！', en: 'Recommended add-on services:\n\n🌟 Enhance professionalism:\n• Enhanced LED lighting (+¥1,200)\n• Custom brand decoration (+¥1,800)\n\n🛡️ Support services:\n• 24/7 online support (+¥800)\n• On-site rapid response (+¥600)\n\nFlexible selection based on your budget!' },
+                    '增值': { zh: '我推荐以下增值服务选项：\n\n📋 设计咨询类：\n• 平面设计咨询服务 (+¥1,500) - 专业设计师指导\n• 展位布局优化建议 (+¥800) - 提升空间利用率\n\n🧹 现场服务类：\n• 展位清洁服务 (+¥600/天) - 保持展位整洁\n• 展位杂软服务 (+¥400/天) - 现场维护支持\n\n📸 专业摄影类：\n• 展位摄影服务 (+¥1,200) - 专业摄影师拍摄\n• 展位摄像服务 (+¥1,800) - 高清视频记录\n\n根据您的预算和需求，灵活选择合适的服务！', en: 'Recommended add-on services:\n\n📋 Design consulting:\n• Graphic design consultation (+¥1,500)\n• Layout optimization (+¥800)\n\n🧹 On-site services:\n• Cleaning service (+¥600/day)\n• Maintenance support (+¥400/day)\n\n📸 Professional photography:\n• Photography service (+¥1,200)\n• Video recording (+¥1,800)\n\nFlexible selection based on your needs!' },
                     '优惠': { zh: '当前优惠政策：\n\n🎁 优惠方式：\n• 早鸟优惠：提前30天预订享95折\n• 老客户：返展客户享9折\n• 大单优惠：3个以上展位享额外折扣\n• 推荐奖励：推荐新客户获¥500代金券\n\n您目前可享受的优惠，我会在订单确认时自动计算！', en: 'Current promotional offers:\n\n🎁 Discounts:\n• Early bird: 5% off for 30-day advance booking\n• Returning customers: 10% off\n• Bulk orders: Extra discount for 3+ booths\n• Referral reward: ¥500 voucher\n\nEligible discounts will be automatically calculated!' },
                     '成本': { zh: '降低成本的建议：\n\n💡 省钱策略：\n• 选择标准版而非高级版\n• 选择较小尺寸（如3×4m而非3×6m）\n• 减少可选增值服务\n• 提高可复用率，降低长期成本\n• 参加早鸟优惠活动\n\n但要注意平衡成本和展示效果，确保达到营销目标！', en: 'Cost reduction suggestions:\n\n💡 Money-saving strategies:\n• Choose Standard instead of Premium\n• Select smaller size (3×4m vs 3×6m)\n• Reduce optional add-ons\n• Higher reusability = lower long-term costs\n• Early bird discounts\n\nBalance cost with exhibition effectiveness!' }
                 },
