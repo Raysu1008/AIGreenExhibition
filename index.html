@@ -2064,6 +2064,7 @@
                                 type="text" 
                                 id="username" 
                                 placeholder="Demo"
+                                value="Demo"
                                 required
                             />
                         </div>
@@ -2078,6 +2079,7 @@
                                 type="password" 
                                 id="password" 
                                 placeholder="••••••"
+                                value="Demo_123"
                                 required
                             />
                         </div>
@@ -3527,114 +3529,77 @@
         }
 
         async function applyCustomization() {
-            const baseImg = await loadBaseImage();
-            const logoImg = await loadLogoImage();
-            const primary = document.getElementById('color-primary').value;
-            const secondary = document.getElementById('color-secondary').value;
-            const positionSel = document.getElementById('logo-position').value;
-            const prompt = document.getElementById('prompt-text').value;
-            const promptCfg = parsePrompt(prompt);
-
             // 显示加载动画
             const btnEle = event.target;
             const originalText = btnEle.innerHTML;
             btnEle.disabled = true;
             btnEle.innerHTML = '<span class="loading-spinner"></span>' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
 
-            const canvases = [frontCanvas, leftCanvas, rightCanvas];
-            const angles = [0, -8, 8];
-            const titles = [currentLanguage === 'en' ? 'Front View' : '正面', currentLanguage === 'en' ? 'Left Corner' : '左前角', currentLanguage === 'en' ? 'Right Corner' : '右前角'];
+            // 使用实际的 AI 生成图片（Gemini）
+            const geminiImages = [
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+            ];
 
-            canvases.forEach((canvas, idx) => {
+            const canvases = [frontCanvas, leftCanvas, rightCanvas];
+            const titles = [
+                currentLanguage === 'en' ? 'Front View' : '正面预览',
+                currentLanguage === 'en' ? 'Left View' : '左侧视角',
+                currentLanguage === 'en' ? 'Right View' : '右侧视角'
+            ];
+
+            // 在 canvas 上显示 Gemini 图片
+            for (let idx = 0; idx < canvases.length; idx++) {
+                const canvas = canvases[idx];
                 const ctx = canvas.getContext('2d');
                 const w = canvas.width = canvas.clientWidth;
                 const h = canvas.height = canvas.clientHeight;
                 ctx.clearRect(0, 0, w, h);
 
-                // 背景渐变
-                const grad = ctx.createLinearGradient(0, 0, w, h);
-                grad.addColorStop(0, '#f8f9fa');
-                grad.addColorStop(1, '#e9ecef');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, w, h);
-
-                // 绘制基础图片（中心）
-                ctx.save();
-                // angle transform
-                ctx.translate(w/2, h/2);
-                ctx.rotate(angles[idx] * Math.PI / 180);
-                // draw base image scaled
-                const scale = Math.min(w / baseImg.width, h / baseImg.height) * 0.85;
-                const dw = baseImg.width * scale;
-                const dh = baseImg.height * scale;
-                ctx.filter = `brightness(${promptCfg.brightness}) saturate(${promptCfg.saturate}) hue-rotate(${promptCfg.hue}deg)`;
-                ctx.drawImage(baseImg, -dw/2, -dh/2, dw, dh);
-                ctx.filter = 'none';
-                ctx.restore();
-
-                // 主色透明覆盖
-                const overlayColor = promptCfg.primary || primary;
-                ctx.globalAlpha = 0.15;
-                ctx.fillStyle = overlayColor;
-                ctx.fillRect(0, 0, w, h);
-                ctx.globalAlpha = 1.0;
-
-                // 绘制装饰边框
-                ctx.strokeStyle = overlayColor;
-                ctx.lineWidth = 2;
-                ctx.globalAlpha = 0.4;
-                ctx.strokeRect(10, 10, w-20, h-20);
-                ctx.globalAlpha = 1.0;
-
-                // 绘制Logo
-                if (logoImg) {
-                    const pos = promptCfg.position || positionSel;
-                    const lw = Math.min(w * 0.25, 150);
-                    const lh = lw * (logoImg.height / logoImg.width);
-                    let x = (w - lw)/2, y = (h - lh)/2;
-                    if (pos === 'top-left') { x = 12; y = 12; }
-                    if (pos === 'top-right') { x = w - lw - 12; y = 12; }
-                    if (pos === 'bottom-left') { x = 12; y = h - lh - 12; }
-                    if (pos === 'bottom-right') { x = w - lw - 12; y = h - lh - 12; }
-                    // Logo背景圆角框
-                    ctx.globalAlpha = 0.95;
-                    ctx.fillStyle = 'white';
-                    ctx.shadowColor = 'rgba(0,0,0,0.1)';
-                    ctx.shadowBlur = 8;
-                    ctx.shadowOffsetX = 0;
-                    ctx.shadowOffsetY = 2;
-                    ctx.beginPath();
-                    ctx.roundRect(x-4, y-4, lw+8, lh+8, 6);
-                    ctx.fill();
-                    ctx.shadowColor = 'transparent';
-                    ctx.drawImage(logoImg, x, y, lw, lh);
-                    ctx.globalAlpha = 1.0;
-                }
-
-                // 标题与说明
-                ctx.fillStyle = overlayColor;
-                ctx.font = 'bold 12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.globalAlpha = 0.7;
-                ctx.fillText(titles[idx], w/2, 22);
-                ctx.globalAlpha = 1.0;
-
-                // 角标签
-                ctx.fillStyle = overlayColor;
-                ctx.globalAlpha = 0.6;
-                ctx.font = '10px sans-serif';
-                ctx.textAlign = 'right';
-                ctx.fillText('AI Preview', w - 12, h - 8);
-                ctx.globalAlpha = 1.0;
-            });
-
-            // 显示AI效果图（使用替换Logo的效果图）
-            const logoImgSrc = scenarios[currentScenario].logo;
-            if (logoImgSrc) {
-                const aiOutputImg = document.getElementById('ai-output-image');
-                aiOutputImg.src = logoImgSrc;
-                document.getElementById('ai-output-section').style.display = 'block';
+                // 加载并显示 Gemini 图片
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        // 计算适配尺寸
+                        const scale = Math.min(w / img.width, h / img.height);
+                        const dw = img.width * scale;
+                        const dh = img.height * scale;
+                        const x = (w - dw) / 2;
+                        const y = (h - dh) / 2;
+                        
+                        // 绘制图片
+                        ctx.drawImage(img, x, y, dw, dh);
+                        
+                        // 添加标题
+                        ctx.fillStyle = '#7c3aed';
+                        ctx.font = 'bold 14px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.globalAlpha = 0.9;
+                        ctx.fillText(titles[idx], w/2, 25);
+                        ctx.globalAlpha = 1.0;
+                        
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        // 如果加载失败，显示占位符
+                        ctx.fillStyle = '#f8f9fa';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.fillStyle = '#7f8c8d';
+                        ctx.font = '14px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('加载中...', w/2, h/2);
+                        resolve();
+                    };
+                    img.src = geminiImages[idx];
+                });
             }
+
+            // 显示第一张 Gemini 图片作为主效果图
+            const aiOutputImg = document.getElementById('ai-output-image');
+            aiOutputImg.src = geminiImages[0];
+            document.getElementById('ai-output-section').style.display = 'block';
 
             // 恢复按钮状态
             setTimeout(() => {
@@ -3643,14 +3608,20 @@
             }, 1500);
 
             // log customization
+            const primary = document.getElementById('color-primary').value;
+            const secondary = document.getElementById('color-secondary').value;
+            const positionSel = document.getElementById('logo-position').value;
+            const prompt = document.getElementById('prompt-text').value;
+            
             customizationLogs.push({
                 time: new Date().toISOString(),
                 template: selectedTemplateName,
                 scenario: currentScenario,
                 colors: { primary, secondary },
                 logo: !!document.getElementById('logo-upload').files[0],
-                position: promptCfg.position || positionSel,
-                prompt
+                position: positionSel,
+                prompt,
+                geminiImages: geminiImages
             });
         }
 
