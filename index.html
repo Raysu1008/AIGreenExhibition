@@ -1268,12 +1268,12 @@
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            /* Avoid clipping/stacking issues that can hide the chat column */
             overflow: visible;
             display: none;
             animation: slideIn 0.4s ease;
             position: relative;
             z-index: 5;
+            transition: all 0.3s ease;
         }
 
         .embedded-chat-panel.active {
@@ -1282,6 +1282,30 @@
             gap: 0;
             min-height: 600px;
             max-height: 70vh;
+        }
+        
+        /* 当聊天面板处于右对齐模式时 */
+        .embedded-chat-panel.right-aligned {
+            position: fixed;
+            right: 0;
+            top: 84px;
+            max-width: 40%;
+            width: 500px;
+            height: calc(100vh - 84px);
+            max-height: calc(100vh - 84px);
+            margin: 0;
+            border-radius: 0;
+            z-index: 1000;
+            grid-template-columns: 1fr;
+        }
+        
+        .embedded-chat-panel.right-aligned .chat-main-content {
+            display: none;
+        }
+        
+        /* 当聊天面板右对齐时，主内容区域需要给聊天面板留出空间 */
+        .process-container.chat-right-mode {
+            margin-right: 500px;
         }
 
         @keyframes slideIn {
@@ -2121,7 +2145,7 @@
                 </div>
                 
                 <!-- Chat AI 按钮 -->
-                <button class="chat-toggle-btn" onclick="toggleEmbeddedChat()">
+                <button class="chat-toggle-btn" onclick="toggleEmbeddedChat(true)">
                     <i class="bi bi-chat-dots-fill"></i>
                     <span class="zh">Chat AI</span>
                     <span class="en">Chat AI</span>
@@ -2360,52 +2384,60 @@
             
             <div class="form-group">
                 <label>展位尺寸</label>
-                <select class="form-control" id="template-size">
-                    <option value="">-- 请选择 --</option>
-                    <option value="3x3">3m × 3m（9㎡）</option>
-                    <option value="6x3">6m × 3m（18㎡）</option>
-                    <option value="6x6">6m × 6m（36㎡）</option>
+                <select class="form-control" id="template-size" onchange="filterTemplates()">
+                    <option value="">-- 全部尺寸 --</option>
+                    <option value="9">9㎡ (3m × 3m)</option>
+                    <option value="18">18㎡ (6m × 3m)</option>
+                    <option value="27">27㎡ (9m × 3m)</option>
+                    <option value="36">36㎡ (6m × 6m)</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>展示风格</label>
-                <select class="form-control" id="template-style">
-                    <option value="">-- 请选择 --</option>
+                <select class="form-control" id="template-style" onchange="filterTemplates()">
+                    <option value="">-- 全部风格 --</option>
                     <option value="modern">现代简约</option>
                     <option value="nature">自然环保</option>
                     <option value="tech">科技感</option>
+                    <option value="premium">高端品牌</option>
                 </select>
             </div>
 
             <div class="section-title" style="margin-top: 30px; border-left: 4px solid #27ae60;"><span class="zh">绿色环保方案库</span><span class="en show">Green Solution Library</span></div>
-            <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 15px;"><span class="zh">💡 提示：点击任意方案卡片可查看详情和可选服务</span><span class="en show">💡 Tip: Click any booth template to view details and optional add-ons</span></p>
-            <div class="template-grid">
-                <div class="template-card" onclick="selectTemplate(this, 'T001', '简洁绿色展位'); openModal('T001')">
-                    <img class="template-image" id="template-image-1" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png', '方案一：简洁绿色展位 - 对外效果图')">
+            <p style="color: #7f8c8d; font-size: 13px; margin-bottom: 15px;">
+                <span class="zh">💡 提示：选择尺寸或风格可自动筛选 | 点击图片可放大预览</span>
+                <span class="en show">💡 Tip: Select size or style to auto-filter | Click image to preview</span>
+            </p>
+            <div class="template-grid" id="template-gallery">
+                <div class="template-card" data-size="18" data-style="modern" onclick="selectTemplate(this, 'T001', '简洁绿色展位'); openModal('T001')">
+                    <img class="template-image clickable-image" id="template-image-1" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png', '简洁绿色展位 - 18㎡ (6m × 3m)')">
                     <div class="template-title">简洁绿色展位</div>
                     <div class="template-spec">
-                        <div>尺寸: 6m × 3m</div>
+                        <div><strong>18㎡</strong> (6m × 3m)</div>
+                        <div>风格: 现代简约</div>
                         <div>材料: 铝合金框架</div>
                         <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 92%</div>
                     </div>
                 </div>
 
-                <div class="template-card" onclick="selectTemplate(this, 'T002', '生态互动展位'); openModal('T002')">
-                    <img class="template-image" id="template-image-2" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png', '方案二：生态互动展位 - 对外效果图')">
+                <div class="template-card" data-size="36" data-style="nature" onclick="selectTemplate(this, 'T002', '生态互动展位'); openModal('T002')">
+                    <img class="template-image clickable-image" id="template-image-2" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png', '生态互动展位 - 36㎡ (6m × 6m)')">
                     <div class="template-title">生态互动展位</div>
                     <div class="template-spec">
-                        <div>尺寸: 6m × 6m</div>
+                        <div><strong>36㎡</strong> (6m × 6m)</div>
+                        <div>风格: 自然环保</div>
                         <div>材料: 木质框架</div>
                         <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 88%</div>
                     </div>
                 </div>
 
-                <div class="template-card" onclick="selectTemplate(this, 'T003', '高端品牌展位'); openModal('T003')">
-                    <div class="template-image"><i class="bi bi-image" style="font-size: 32px; color: #bbb;"></i></div>
+                <div class="template-card" data-size="36" data-style="premium" onclick="selectTemplate(this, 'T003', '高端品牌展位'); openModal('T003')">
+                    <img class="template-image clickable-image" id="template-image-3" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png" alt="模板示意图" onclick="event.stopPropagation(); previewImage('https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png', '高端品牌展位 - 36㎡ (6m × 6m)')">
                     <div class="template-title">高端品牌展位</div>
                     <div class="template-spec">
-                        <div>尺寸: 6m × 6m</div>
+                        <div><strong>36㎡</strong> (6m × 6m)</div>
+                        <div>风格: 高端品牌</div>
                         <div>材料: 铝合金+木质</div>
                         <div style="color: #27ae60; font-weight: 600; margin-top: 6px;">可复用率: 85%</div>
                     </div>
@@ -3800,6 +3832,49 @@
             snaps.forEach((dataUrl, idx) => artifactImages.push({ title: titles[idx], url: dataUrl }));
             renderArtifacts();
         }
+        
+        // 模板筛选功能
+        function filterTemplates() {
+            const sizeFilter = document.getElementById('template-size').value;
+            const styleFilter = document.getElementById('template-style').value;
+            const cards = document.querySelectorAll('#template-gallery .template-card');
+            
+            let visibleCount = 0;
+            
+            cards.forEach(card => {
+                const cardSize = card.getAttribute('data-size');
+                const cardStyle = card.getAttribute('data-style');
+                
+                const sizeMatch = !sizeFilter || cardSize === sizeFilter;
+                const styleMatch = !styleFilter || cardStyle === styleFilter;
+                
+                if (sizeMatch && styleMatch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            console.log(`筛选结果: ${visibleCount} 个方案符合条件`);
+            
+            // 如果没有匹配的结果，显示提示
+            const gallery = document.getElementById('template-gallery');
+            let noResultMsg = gallery.querySelector('.no-results-message');
+            
+            if (visibleCount === 0) {
+                if (!noResultMsg) {
+                    noResultMsg = document.createElement('div');
+                    noResultMsg.className = 'no-results-message';
+                    noResultMsg.style.cssText = 'grid-column: 1/-1; text-align: center; padding: 40px; color: #999;';
+                    noResultMsg.innerHTML = '<i class="bi bi-search" style="font-size: 48px; display: block; margin-bottom: 16px;"></i><p>暂无符合条件的方案，请调整筛选条件</p>';
+                    gallery.appendChild(noResultMsg);
+                }
+                noResultMsg.style.display = 'block';
+            } else if (noResultMsg) {
+                noResultMsg.style.display = 'none';
+            }
+        }
 
         function renderArtifacts() {
             const list = document.getElementById('artifact-list');
@@ -4309,18 +4384,42 @@
 
         // ============= 嵌入式聊天面板功能 =============
         let embeddedChatOpen = false;
+        let chatRightAligned = false;
         
-        function toggleEmbeddedChat() {
-            console.log('toggleEmbeddedChat called, current state:', embeddedChatOpen);
+        function toggleEmbeddedChat(forceRightAlign = false) {
+            console.log('toggleEmbeddedChat called, current state:', embeddedChatOpen, 'forceRightAlign:', forceRightAlign);
             const panel = document.getElementById('embedded-chat-panel');
+            const container = document.querySelector('.process-container');
             console.log('Panel element:', panel);
             
-            embeddedChatOpen = !embeddedChatOpen;
-            console.log('New state:', embeddedChatOpen);
+            if (forceRightAlign && !embeddedChatOpen) {
+                // 用户点击Chat AI按钮，需要右对齐
+                embeddedChatOpen = true;
+                chatRightAligned = true;
+                panel.classList.add('active', 'right-aligned');
+                container.classList.add('chat-right-mode');
+                console.log('Opened chat in right-aligned mode');
+            } else {
+                embeddedChatOpen = !embeddedChatOpen;
+                console.log('New state:', embeddedChatOpen);
+                
+                if (embeddedChatOpen) {
+                    // 默认内嵌模式
+                    panel.classList.add('active');
+                    panel.classList.remove('right-aligned');
+                    container.classList.remove('chat-right-mode');
+                    chatRightAligned = false;
+                    console.log('Added active class to panel (embedded mode)');
+                } else {
+                    // 关闭
+                    panel.classList.remove('active', 'right-aligned');
+                    container.classList.remove('chat-right-mode');
+                    chatRightAligned = false;
+                    console.log('Removed active class from panel');
+                }
+            }
             
             if (embeddedChatOpen) {
-                panel.classList.add('active');
-                console.log('Added active class to panel');
                 // 滚动到底部
                 setTimeout(() => {
                     const body = document.getElementById('floating-chat-body');
@@ -4328,12 +4427,11 @@
                     if (body) {
                         body.scrollTop = body.scrollHeight;
                     }
-                    // 平滑滚动到聊天面板
-                    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    // 如果不是右对齐模式，才滚动到聊天面板
+                    if (!chatRightAligned) {
+                        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }, 100);
-            } else {
-                panel.classList.remove('active');
-                console.log('Removed active class from panel');
             }
         }
 
