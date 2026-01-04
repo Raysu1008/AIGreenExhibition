@@ -4008,28 +4008,43 @@
         function matchScenarioImages(prompt) {
             const p = (prompt || '').toLowerCase();
             
-            // 三张基础图片（始终显示所有三张）
+            // 检查是否选择了展位
+            let baseImage = 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png';
+            
+            // 如果已选择展位，使用选中展位的图片作为底图
+            if (selectedTemplate && templateDetails[selectedTemplate]) {
+                const template = templateDetails[selectedTemplate];
+                baseImage = template.image;
+                console.log('📸 使用选中展位作为底图:', selectedTemplate, template.name_zh);
+            } else {
+                console.log('⚠️ 未选择展位，使用默认图片');
+            }
+            
+            // 三张基础图片（将选中的展位图片作为基础）
+            // 注意：由于目前只有一张图片，我们复用3次并添加不同的视角标题
             const allImages = [
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
-                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
+                baseImage,  // 正面视角
+                baseImage,  // 左视角（实际是同一张图）
+                baseImage   // 右视角（实际是同一张图）
             ];
             
             // 根据提示词匹配标题
-            let titles = ['基础方案', '接待台方案', '陈列台方案'];
+            let titles = ['正面视角', '左前角视角', '右前角视角'];
             
             if (p.includes('接待台') && p.includes('陈列台')) {
-                titles = ['基础展位', '带接待台效果', '带陈列台效果'];
+                titles = ['基础展位', '带接待台效果（AI生成）', '带陈列台效果（AI生成）'];
             } else if (p.includes('接待台')) {
-                titles = ['原始方案', '接待台方案（推荐）', '可选陈列台方案'];
+                titles = ['原始方案', '接待台方案（AI推荐）', '可选视角'];
             } else if (p.includes('陈列台')) {
-                titles = ['原始方案', '可选接待台方案', '陈列台方案（推荐）'];
+                titles = ['原始方案', '可选视角', '陈列台方案（AI推荐）'];
             } else if (p.includes('照明') || p.includes('灯光')) {
-                titles = ['标准照明', '增强照明方案A', '增强照明方案B'];
+                titles = ['当前照明', '增强照明方案A（AI）', '增强照明方案B（AI）'];
+            } else if (p.includes('颜色') || p.includes('配色')) {
+                titles = ['原始配色', '配色方案A（AI）', '配色方案B（AI）'];
             }
             
-            console.log('AI生成: 始终输出3张效果图');
-            console.log('图片标题:', titles);
+            console.log('🎨 AI生成: 使用展位', selectedTemplate, '作为底图');
+            console.log('🏷️ 图片标题:', titles);
             
             // 始终返回所有三张图片
             return {
@@ -4414,35 +4429,163 @@
         }
 
         // 模态对话框功能
-        const templateDetails = {
-            T001: {
+        // ====== 展位详细信息配置 ======
+        
+        // 根据尺寸生成展位详细数据
+        function generateTemplateDetails() {
+            const details = {};
+            
+            // 尺寸配置
+            const sizeConfigs = {
+                18: {
+                    basePrice: 18000,
+                    material: '铝合金框架',
+                    material_en: 'Aluminum frame',
+                    reusability: 90,
+                    buildDays: '3-4天',
+                    buildDays_en: '3-4 days'
+                },
+                27: {
+                    basePrice: 26000,
+                    material: '铝合金+木质',
+                    material_en: 'Aluminum + Wood',
+                    reusability: 88,
+                    buildDays: '4-5天',
+                    buildDays_en: '4-5 days'
+                },
+                36: {
+                    basePrice: 36000,
+                    material: '铝合金+木质框架',
+                    material_en: 'Aluminum + Wood frame',
+                    reusability: 85,
+                    buildDays: '5-6天',
+                    buildDays_en: '5-6 days'
+                }
+            };
+            
+            // 风格描述
+            const styleDescriptions = {
+                nature: {
+                    zh: '融合自然元素和环保理念，采用木质框架和绿色植物装饰，营造生态友好的展示空间。',
+                    en: 'Integrates natural elements and eco-friendly concepts with wooden frames and green plant decorations, creating an environmentally friendly display space.'
+                },
+                tech: {
+                    zh: '运用现代科技元素，配合智能照明和互动屏幕，展现企业的创新技术实力。',
+                    en: 'Utilizes modern technology elements with smart lighting and interactive screens to showcase enterprise innovation and technical strength.'
+                },
+                premium: {
+                    zh: '高端大气的设计风格，精选优质材料和精致细节，适合展示高端品牌形象。',
+                    en: 'Premium elegant design with carefully selected quality materials and exquisite details, ideal for displaying high-end brand image.'
+                },
+                modern: {
+                    zh: '简约现代的设计理念，注重空间利用和功能性，适合各类企业展示核心产品。',
+                    en: 'Minimalist modern design concept emphasizing space utilization and functionality, suitable for various enterprises to showcase core products.'
+                }
+            };
+            
+            // 风格名称
+            const styleNames = {
+                nature: { zh: '自然环保', en: 'Natural Eco' },
+                tech: { zh: '科技智能', en: 'Tech Smart' },
+                premium: { zh: '高端品牌', en: 'Premium Brand' },
+                modern: { zh: '现代简约', en: 'Modern Simple' }
+            };
+            
+            // 生成所有展位的详细数据
+            const styles = ['nature', 'tech', 'premium', 'modern'];
+            const sizes = [
+                { sqm: 18, dim: '6m × 3m', count: 15, start: 1 },
+                { sqm: 27, dim: '9m × 3m', count: 15, start: 16 },
+                { sqm: 36, dim: '6m × 6m', count: 15, start: 31 }
+            ];
+            
+            // 生成45个PDF展位
+            sizes.forEach(sizeConfig => {
+                for (let i = 0; i < sizeConfig.count; i++) {
+                    const boothNum = sizeConfig.start + i;
+                    const boothId = `T${String(boothNum).padStart(3, '0')}`;
+                    const styleIndex = i % 4;
+                    const style = styles[styleIndex];
+                    const config = sizeConfigs[sizeConfig.sqm];
+                    const styleName = styleNames[style];
+                    const styleDesc = styleDescriptions[style];
+                    
+                    details[boothId] = {
+                        id: boothId,
+                        name_zh: `${styleName.zh}展位方案 ${boothNum}`,
+                        name_en: `${styleName.en} Booth ${boothNum}`,
+                        description_zh: styleDesc.zh,
+                        description_en: styleDesc.en,
+                        specs_zh: [
+                            `尺寸: ${sizeConfig.dim} (${sizeConfig.sqm}㎡)`,
+                            `材料: ${config.material}`,
+                            `可复用率: ${config.reusability}%`,
+                            `建设周期: ${config.buildDays}`
+                        ],
+                        specs_en: [
+                            `Size: ${sizeConfig.dim} (${sizeConfig.sqm}㎡)`,
+                            `Material: ${config.material_en}`,
+                            `Reusability: ${config.reusability}%`,
+                            `Construction: ${config.buildDays_en}`
+                        ],
+                        basePrice: config.basePrice,
+                        size: sizeConfig.sqm,
+                        style: style,
+                        image: `https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/展位方案集/page_${String(boothNum).padStart(3, '0')}.png`
+                    };
+                }
+            });
+            
+            // 添加原有的3个展位（T046-T048）
+            details.T046 = {
+                id: 'T046',
                 name_zh: '简洁绿色展位',
                 name_en: 'Simple Green Booth',
                 description_zh: '采用环保铝合金框架，设计简洁现代，适合中小企业展示核心产品。',
                 description_en: 'Features eco-friendly aluminum frame with clean modern design, ideal for small to medium enterprises to showcase core products.',
                 specs_zh: ['尺寸: 6m × 3m (18㎡)', '材料: 铝合金框架', '可复用率: 92%', '建设周期: 3-4天'],
                 specs_en: ['Size: 6m × 3m (18㎡)', 'Material: Aluminum frame', 'Reusability: 92%', 'Construction: 3-4 days'],
-                basePrice: 18000
-            },
-            T002: {
+                basePrice: 18000,
+                size: 18,
+                style: 'modern',
+                image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/对外效果图.png'
+            };
+            
+            details.T047 = {
+                id: 'T047',
                 name_zh: '生态互动展位',
                 name_en: 'Eco-Interactive Booth',
                 description_zh: '融合木质框架和生态元素，创造沉浸式体验，适合展示环保理念和产品互动。',
                 description_en: 'Combines wooden frame with ecological elements to create immersive experience, perfect for showcasing environmental concepts and interactive products.',
                 specs_zh: ['尺寸: 6m × 6m (36㎡)', '材料: 木质框架', '可复用率: 88%', '建设周期: 4-5天'],
                 specs_en: ['Size: 6m × 6m (36㎡)', 'Material: Wood frame', 'Reusability: 88%', 'Construction: 4-5 days'],
-                basePrice: 32000
-            },
-            T003: {
+                basePrice: 36000,
+                size: 36,
+                style: 'nature',
+                image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/对外效果图.png'
+            };
+            
+            details.T048 = {
+                id: 'T048',
                 name_zh: '高端品牌展位',
                 name_en: 'Premium Brand Booth',
                 description_zh: '结合铝合金与木质材料，设计高端大气，适合品牌形象展示和高端洽谈。',
                 description_en: 'Combines aluminum and wood materials with premium elegant design, ideal for brand image display and executive meetings.',
                 specs_zh: ['尺寸: 6m × 6m (36㎡)', '材料: 铝合金+木质', '可复用率: 85%', '建设周期: 5-6天'],
                 specs_en: ['Size: 6m × 6m (36㎡)', 'Material: Aluminum + Wood', 'Reusability: 85%', 'Construction: 5-6 days'],
-                basePrice: 42000
-            }
-        };
+                basePrice: 42000,
+                size: 36,
+                style: 'premium',
+                image: 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/搭建完毕现场照.png'
+            };
+            
+            return details;
+        }
+        
+        // 生成展位详细数据
+        const templateDetails = generateTemplateDetails();
+        
+        console.log('✅ 生成了', Object.keys(templateDetails).length, '个展位详细数据');
 
         const optionalServices = {
             colors: [
