@@ -1145,6 +1145,96 @@
             font-weight: 700;
         }
 
+        /* 服务商卡片样式 */
+        .supplier-card {
+            border: 2px solid #e3f2fd;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f9fafe;
+            transition: all 0.3s;
+        }
+
+        .supplier-card:hover {
+            border-color: #2196f3;
+            background: #e3f2fd;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
+        }
+
+        .supplier-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .supplier-id {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+        }
+
+        .supplier-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #f39c12;
+        }
+
+        /* BOM表格样式 */
+        .bom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .bom-table th {
+            background: #ecf0f1;
+            color: #2c3e50;
+            font-weight: 600;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .bom-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ecf0f1;
+            color: #555;
+        }
+
+        .bom-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* 绿色指标卡片 */
+        .green-indicator {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .green-indicator-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4caf50;
+            margin-bottom: 4px;
+        }
+
+        .green-indicator-label {
+            font-size: 12px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .green-indicator-sublabel {
+            font-size: 10px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
         .modal-footer {
             display: flex;
             gap: 12px;
@@ -4008,31 +4098,18 @@
         function matchScenarioImages(prompt) {
             const p = (prompt || '').toLowerCase();
             
-            // 检查是否选择了展位
-            let baseImage = 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png';
-            
-            // 如果已选择展位，使用选中展位的图片作为底图
-            if (selectedTemplate && templateDetails[selectedTemplate]) {
-                const template = templateDetails[selectedTemplate];
-                baseImage = template.image;
-                console.log('📸 使用选中展位作为底图:', selectedTemplate, template.name_zh);
-            } else {
-                console.log('⚠️ 未选择展位，使用默认图片');
-            }
-            
-            // 三张基础图片（将选中的展位图片作为基础）
-            // 注意：由于目前只有一张图片，我们复用3次并添加不同的视角标题
+            // Demo阶段：固定使用Gemini图片（不使用选中展位图片）
             const allImages = [
-                baseImage,  // 正面视角
-                baseImage,  // 左视角（实际是同一张图）
-                baseImage   // 右视角（实际是同一张图）
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png',
+                'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png'
             ];
             
             // 根据提示词匹配标题
             let titles = ['正面视角', '左前角视角', '右前角视角'];
             
             if (p.includes('接待台') && p.includes('陈列台')) {
-                titles = ['基础展位', '带接待台效果（AI生成）', '带陈列台效果（AI生成）'];
+                titles = ['基础展位（AI）', '带接待台效果（AI生成）', '带陈列台效果（AI生成）'];
             } else if (p.includes('接待台')) {
                 titles = ['原始方案', '接待台方案（AI推荐）', '可选视角'];
             } else if (p.includes('陈列台')) {
@@ -4043,7 +4120,7 @@
                 titles = ['原始配色', '配色方案A（AI）', '配色方案B（AI）'];
             }
             
-            console.log('🎨 AI生成: 使用展位', selectedTemplate, '作为底图');
+            console.log('🎨 AI生成: 使用固定Gemini图片（Demo阶段）');
             console.log('🏷️ 图片标题:', titles);
             
             // 始终返回所有三张图片
@@ -4431,6 +4508,78 @@
         // 模态对话框功能
         // ====== 展位详细信息配置 ======
         
+        // 生成服务商数据
+        function generateSupplierData(boothId, size) {
+            // 根据展位尺寸和ID推荐服务商
+            const suppliers = [
+                { id: 'SUP001', name_zh: '绿色搭建', name_en: 'Green Build Co.', rating: 4.9, group: 'A' },
+                { id: 'SUP002', name_zh: '环保展装', name_en: 'Eco Display Ltd.', rating: 4.8, group: 'A' },
+                { id: 'SUP003', name_zh: '智能展览', name_en: 'Smart Expo Inc.', rating: 4.7, group: 'B' },
+                { id: 'SUP004', name_zh: '品质空间', name_en: 'Quality Space', rating: 4.9, group: 'A' },
+                { id: 'SUP005', name_zh: '可持续设计', name_en: 'Sustainable Design', rating: 4.6, group: 'B' }
+            ];
+            
+            // 根据展位编号选择2-3个服务商
+            const hash = parseInt(boothId.replace('T', ''));
+            const count = size >= 36 ? 3 : 2;
+            const selectedSuppliers = [];
+            
+            for (let i = 0; i < count; i++) {
+                const index = (hash + i) % suppliers.length;
+                selectedSuppliers.push(suppliers[index]);
+            }
+            
+            return selectedSuppliers;
+        }
+        
+        // 生成BOM数据
+        function generateBOMData(size, style) {
+            // 基础材料（所有展位通用）
+            const baseBOM = [
+                { name_zh: '铝合金框架', name_en: 'Aluminum Frame', spec: '40x40mm', unit_zh: '米', unit_en: 'm' },
+                { name_zh: '防火板材', name_en: 'Fire-proof Board', spec: '18mm', unit_zh: '平方米', unit_en: 'm²' },
+                { name_zh: 'LED射灯', name_en: 'LED Spotlight', spec: '12W', unit_zh: '个', unit_en: 'pcs' },
+                { name_zh: '地毯', name_en: 'Carpet', spec: '环保尼龙', unit_zh: '平方米', unit_en: 'm²' }
+            ];
+            
+            // 根据尺寸计算数量
+            const quantities = {
+                18: { frame: 24, board: 20, lights: 4, carpet: 18 },
+                27: { frame: 36, board: 30, lights: 6, carpet: 27 },
+                36: { frame: 48, board: 40, lights: 8, carpet: 36 }
+            };
+            
+            const qty = quantities[size] || quantities[18];
+            
+            return [
+                { ...baseBOM[0], quantity: qty.frame },
+                { ...baseBOM[1], quantity: qty.board },
+                { ...baseBOM[2], quantity: qty.lights },
+                { ...baseBOM[3], quantity: qty.carpet }
+            ];
+        }
+        
+        // 生成绿色指标数据
+        function generateGreenIndicators(size, style) {
+            // 根据尺寸和风格计算绿色指标
+            const baseCarbon = size * 2.5; // 基础碳排放
+            const styleFactors = {
+                nature: { carbon: 0.8, recycle: 92, energy: 'A+' },
+                tech: { carbon: 1.0, recycle: 88, energy: 'A' },
+                premium: { carbon: 1.2, recycle: 85, energy: 'B+' },
+                modern: { carbon: 0.9, recycle: 90, energy: 'A' }
+            };
+            
+            const factor = styleFactors[style] || styleFactors.modern;
+            
+            return {
+                carbon: Math.round(baseCarbon * factor.carbon * 10) / 10,
+                recyclability: factor.recycle,
+                energyRating: factor.energy,
+                certification: 'ISO 14001'
+            };
+        }
+        
         // 根据尺寸生成展位详细数据
         function generateTemplateDetails() {
             const details = {};
@@ -4645,6 +4794,15 @@
                 `<li style="padding: 6px 0; color: #555;">✓ ${spec}</li>`
             ).join('');
 
+            // 填充服务商信息
+            fillSuppliers(templateId, template.size, isEn);
+            
+            // 填充BOM材料清单
+            fillBOM(template.size, template.style, isEn);
+            
+            // 填充绿色指标
+            fillGreenIndicators(template.size, template.style, isEn);
+
             // 填充可选服务
             fillOptionalServices(isEn);
 
@@ -4655,6 +4813,82 @@
             console.log('About to show modal');
             modal.classList.add('show');
             console.log('Modal classes after show:', modal.classList.toString());
+        }
+        
+        // 填充服务商信息
+        function fillSuppliers(boothId, size, isEn) {
+            const suppliers = generateSupplierData(boothId, size);
+            const container = document.getElementById('modal-suppliers');
+            
+            container.innerHTML = suppliers.map(supplier => `
+                <div class="supplier-card">
+                    <div class="supplier-name">${isEn ? supplier.name_en : supplier.name_zh}</div>
+                    <div class="supplier-id">ID: ${supplier.id} | <span class="zh">组别</span><span class="en">Group</span>: ${supplier.group}</div>
+                    <div class="supplier-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <span>${supplier.rating}</span>
+                        <span style="color: #95a5a6;">/ 5.0</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 填充BOM材料清单
+        function fillBOM(size, style, isEn) {
+            const bomItems = generateBOMData(size, style);
+            const container = document.getElementById('modal-bom');
+            
+            container.innerHTML = `
+                <table class="bom-table">
+                    <thead>
+                        <tr>
+                            <th><span class="zh">材料名称</span><span class="en">Material</span></th>
+                            <th><span class="zh">规格</span><span class="en">Spec</span></th>
+                            <th><span class="zh">数量</span><span class="en">Qty</span></th>
+                            <th><span class="zh">单位</span><span class="en">Unit</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${bomItems.map(item => `
+                            <tr>
+                                <td>${isEn ? item.name_en : item.name_zh}</td>
+                                <td>${item.spec}</td>
+                                <td><strong>${item.quantity}</strong></td>
+                                <td>${isEn ? item.unit_en : item.unit_zh}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // 填充绿色指标
+        function fillGreenIndicators(size, style, isEn) {
+            const indicators = generateGreenIndicators(size, style);
+            const container = document.getElementById('modal-green-indicators');
+            
+            container.innerHTML = `
+                <div class="green-indicator">
+                    <div class="green-indicator-value">${indicators.carbon} kg</div>
+                    <div class="green-indicator-label"><span class="zh">碳排放</span><span class="en">Carbon</span></div>
+                    <div class="green-indicator-sublabel"><span class="zh">每平米</span><span class="en">per m²</span></div>
+                </div>
+                <div class="green-indicator">
+                    <div class="green-indicator-value">${indicators.recyclability}%</div>
+                    <div class="green-indicator-label"><span class="zh">可回收率</span><span class="en">Recyclability</span></div>
+                    <div class="green-indicator-sublabel"><span class="zh">材料重复利用</span><span class="en">Material reuse</span></div>
+                </div>
+                <div class="green-indicator">
+                    <div class="green-indicator-value">${indicators.energyRating}</div>
+                    <div class="green-indicator-label"><span class="zh">能耗等级</span><span class="en">Energy Rating</span></div>
+                    <div class="green-indicator-sublabel"><span class="zh">照明系统</span><span class="en">Lighting</span></div>
+                </div>
+                <div class="green-indicator">
+                    <div class="green-indicator-value">✓</div>
+                    <div class="green-indicator-label"><span class="zh">环保认证</span><span class="en">Certification</span></div>
+                    <div class="green-indicator-sublabel">${indicators.certification}</div>
+                </div>
+            `;
         }
 
         function closeModal() {
@@ -5074,24 +5308,26 @@
             // 获取当前2D图片的路径
             const currentImage = document.getElementById('preview-image').src;
             
-            // 如果是展位模板图片，尝试加载对应的3个视角
-            if (currentTemplateId) {
-                const basePath = currentImage.substring(0, currentImage.lastIndexOf('/') + 1);
-                
-                // 假设图片命名规则：
-                // page_XXX.png (正面)
-                // 如果没有专门的3视角图，使用同一张图片
-                document.getElementById('preview-3d-front').src = currentImage;
-                document.getElementById('preview-3d-left').src = currentImage;
-                document.getElementById('preview-3d-right').src = currentImage;
-                
-                console.log('📸 已加载3D视角图片');
-            } else {
-                // 使用当前图片作为所有视角
-                document.getElementById('preview-3d-front').src = currentImage;
-                document.getElementById('preview-3d-left').src = currentImage;
-                document.getElementById('preview-3d-right').src = currentImage;
+            console.log('🔍 当前图片路径:', currentImage);
+            console.log('📍 当前展位ID:', currentTemplateId);
+            
+            // 检查图片路径是否有效
+            if (!currentImage || currentImage === '' || currentImage === window.location.href) {
+                console.warn('⚠️ 图片路径无效，使用默认Gemini图片');
+                // 使用默认的Gemini图片
+                document.getElementById('preview-3d-front').src = 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_1.png';
+                document.getElementById('preview-3d-left').src = 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_2.png';
+                document.getElementById('preview-3d-right').src = 'https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案二/Gemini_3.png';
+                console.log('✅ 已加载默认3D视角图片');
+                return;
             }
+            
+            // 使用当前图片作为所有视角
+            document.getElementById('preview-3d-front').src = currentImage;
+            document.getElementById('preview-3d-left').src = currentImage;
+            document.getElementById('preview-3d-right').src = currentImage;
+            
+            console.log('📸 已加载3D视角图片（使用当前图片）');
         }
         
         function rotate3DCard(viewIndex) {
@@ -5508,6 +5744,30 @@
                 <ul id="modal-specs-list" style="list-style: none; padding: 0; margin: 0;">
                     <li style="padding: 6px 0;">规格加载中...</li>
                 </ul>
+            </div>
+
+            <!-- 服务商信息 -->
+            <div class="modal-section">
+                <div class="modal-section-title"><i class="bi bi-building"></i> <span class="zh">推荐服务商</span><span class="en show">Recommended Suppliers</span></div>
+                <div id="modal-suppliers" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    <!-- 动态生成服务商 -->
+                </div>
+            </div>
+
+            <!-- BOM材料清单 -->
+            <div class="modal-section">
+                <div class="modal-section-title"><i class="bi bi-list-check"></i> <span class="zh">材料清单(BOM)</span><span class="en show">Bill of Materials</span></div>
+                <div id="modal-bom" style="max-height: 300px; overflow-y: auto;">
+                    <!-- 动态生成BOM -->
+                </div>
+            </div>
+
+            <!-- 绿色指标 -->
+            <div class="modal-section" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 15px; border-radius: 8px;">
+                <div class="modal-section-title"><i class="bi bi-leaf"></i> <span class="zh">绿色环保指标</span><span class="en show">Green Indicators</span></div>
+                <div id="modal-green-indicators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 10px;">
+                    <!-- 动态生成绿色指标 -->
+                </div>
             </div>
 
             <div id="modal-optionals">
