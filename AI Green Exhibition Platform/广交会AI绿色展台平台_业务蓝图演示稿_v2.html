@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>广交会AI绿色展台设计平台｜业务蓝图v2.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&display=swap');
+    html, body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background-color: #f8faff;
+      margin: 0; padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #presentation-container {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .slide {
+      display: none;
+      min-height: 100vh; width: 100%;
+      box-sizing: border-box;
+      position: absolute; top: 0; left: 0;
+      overflow-y: auto;
+      transition: opacity 0.4s ease-in-out;
+      padding-bottom: 108px;
+    }
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      pointer-events: none;
+    }
+    .reveal-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    #navigation {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      background: rgba(255,255,255,0.95);
+      border-top: 1px solid #e5e7eb;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+      z-index: 100; backdrop-filter: blur(10px);
+    }
+    #progress-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .toc-link { text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+    }
+    .demo-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    @media (max-width: 768px) {
+      .copyright-text { font-size: 0.7rem; display: none; }
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+<div id="presentation-container">
+
+  <!-- Slide 1: 封面 -->
+  <header class="slide bg-gradient-to-br from-slate-900 via-emerald-900 to-teal-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-20 text-center">
+      <div class="mb-8 inline-block border border-white/30 rounded-full px-6 py-2 bg-white/10 backdrop-blur-sm">
+        <p class="text-sm md:text-base font-medium tracking-wide">
+          <span class="mr-2">🚀</span>
+          <span class="mr-4 opacity-75">广交会 ×</span>
+          <span class="mr-4">世福集团 ×</span>
+          <span>TB技术团队</span>
+        </p>
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-6">广交会AI绿色展台设计平台</h1>
+      <p class="text-xl md:text-3xl font-light opacity-90">业务蓝图沟通稿 v2.0</p>
+      <p class="text-lg mt-6 opacity-80">从"事后人工审查"到"事前智能内置"的行业级平台</p>
+      
+      <div class="demo-badge mt-8">
+        ✨ 基于v1.6 Demo原型的深化规划
+      </div>
+
+      <div class="mt-6 flex flex-wrap justify-center gap-3 text-sm">
+        <span class="pill">作成日：<span>2026年1月5日</span></span>
+        <span class="pill">版本：<span>v2.0</span></span>
+        <span class="pill">状态：<span>Demo已完成</span></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Slide 2: 会议议程（目录） -->
+  <section class="slide bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">CONTENTS</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">会议议程</h2>
+      <p class="mt-4 text-lg text-gray-600">点击条目可直接跳转到对应章节（演示内链接）。</p>
+
+      <div class="mt-10 p-8 rounded-2xl border bg-slate-50">
+        <ol class="space-y-3 text-lg">
+          <li><span class="toc-link font-semibold" data-goto="2">1. 行业背景与机遇</span></li>
+          <li><span class="toc-link font-semibold" data-goto="6">2. 现有Demo成果展示</span> <span class="demo-badge">NEW</span></li>
+          <li><span class="toc-link font-semibold" data-goto="10">3. 传统模式痛点分析</span></li>
+          <li><span class="toc-link font-semibold" data-goto="13">4. 平台愿景与价值</span></li>
+          <li><span class="toc-link font-semibold" data-goto="17">5. 三阶段实施路线图</span> <span class="demo-badge">ENHANCED</span></li>
+          <li><span class="toc-link font-semibold" data-goto="23">6. Phase 1: MVP详细规划</span> <span class="demo-badge">DETAILED</span></li>
+          <li><span class="toc-link font-semibold" data-goto="31">7. AI核心能力解析</span></li>
+          <li><span class="toc-link font-semibold" data-goto="36">8. 三方协作与资源投入</span> <span class="demo-badge">NEW</span></li>
+          <li><span class="toc-link font-semibold" data-goto="40">9. 商业模式与盈利预测</span></li>
+          <li><span class="toc-link font-semibold" data-goto="43">10. 风险管理与应对</span></li>
+          <li><span class="toc-link font-semibold" data-goto="45">11. 下一步行动计划</span></li>
+        </ol>
+      </div>
+
+      <div class="mt-8 p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+        <h3 class="text-xl font-bold">✨ v2.0 新增亮点</h3>
+        <ul class="mt-2 space-y-1 text-gray-700">
+          <li>✅ 完整Demo原型展示（48方案+三方协同）</li>
+          <li>✅ 详细成本预算和人员配置</li>
+          <li>✅ 三方协作机制和利益分配</li>
+          <li>✅ 12个月详细甘特图</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: 中国会展行业概况 -->
+  <section class="slide bg-gradient-to-br from-white to-slate-50">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">BACKGROUND</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">中国会展行业概况</h2>
+
+      <div class="mt-8 grid lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-white border">
+          <h3 class="text-2xl font-bold mb-4">📊 市场规模</h3>
+          <div class="space-y-3">
+            <div class="reveal-item">
+              <div class="text-3xl font-bold text-emerald-600">6000+亿元</div>
+              <div class="text-gray-600">2023年会展业产值</div>
+            </div>
+            <div class="reveal-item">
+              <div class="text-3xl font-bold text-blue-600">5000+</div>
+              <div class="text-gray-600">年度展览数量</div>
+            </div>
+            <div class="reveal-item">
+              <div class="text-3xl font-bold text-purple-600">1.2亿+</div>
+              <div class="text-gray-600">年度参展人次</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white border">
+          <h3 class="text-2xl font-bold mb-4">🎯 展位规模</h3>
+          <div class="space-y-3 text-gray-700">
+            <div class="reveal-item">• <strong>小型展位（9-36㎡）</strong>: 约80%参展商</div>
+            <div class="reveal-item">• <strong>中型展位（36-100㎡）</strong>: 约15%参展商</div>
+            <div class="reveal-item">• <strong>大型特装（>100㎡）</strong>: 约5%参展商</div>
+            <div class="reveal-item mt-4 p-4 bg-emerald-50 rounded-lg">
+              <strong>核心洞察</strong>: 80%的需求是小型标准展位，但设计成本高、审核周期长
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+        <p class="text-gray-800"><span class="font-semibold">结论：</span>产业规模足够大，但"设计—审核—交付"链条仍高度依赖人工经验，尤其是审图环节已成为效率与合规的共同瓶颈。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 4: 广交会的行业地位 -->
+  <section class="slide bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">CANTON FAIR</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">广交会的行业地位</h2>
+      <p class="mt-4 text-lg text-gray-600">中国第一大展会，具备"标准制定者"的平台势能。</p>
+
+      <div class="mt-10 p-6 rounded-2xl bg-slate-50 border">
+        <h3 class="text-xl font-bold">关键指标</h3>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-emerald-100">
+              <tr>
+                <th class="p-3">指标</th>
+                <th class="p-3">数据</th>
+                <th class="p-3">说明</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              <tr class="reveal-item"><td class="p-3">展览面积</td><td class="p-3 font-bold">118万㎡</td><td class="p-3">全国最大</td></tr>
+              <tr class="reveal-item"><td class="p-3">参展企业</td><td class="p-3 font-bold">2.5万+</td><td class="p-3">每届</td></tr>
+              <tr class="reveal-item"><td class="p-3">采购商</td><td class="p-3 font-bold">20万+</td><td class="p-3">覆盖200+国家</td></tr>
+              <tr class="reveal-item"><td class="p-3">成交额</td><td class="p-3 font-bold">约360亿美元</td><td class="p-3">2023年数据</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <div class="text-3xl mb-3">🎯</div>
+          <h4 class="text-lg font-bold mb-2">行业标杆</h4>
+          <p class="text-sm text-gray-700">广交会的审核标准 = 行业标准</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-blue-50 border border-blue-100">
+          <div class="text-3xl mb-3">🚀</div>
+          <h4 class="text-lg font-bold mb-2">巨大势能</h4>
+          <p class="text-sm text-gray-700">2.5万企业 × 每届2-3个展位 = 5-7.5万展位需求</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-amber-50 border border-amber-100">
+          <div class="text-3xl mb-3">💡</div>
+          <h4 class="text-lg font-bold mb-2">复制潜力</h4>
+          <p class="text-sm text-gray-700">标准化后可推广至全国5000+展会</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 5: 传统展台搭建流程 -->
+  <section class="slide bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-200">AS-IS</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">传统展台搭建流程</h2>
+
+      <div class="mt-10 grid lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-white/10 border border-white/15">
+          <h3 class="text-xl font-bold mb-4">传统流程图</h3>
+          <pre class="mt-4 text-sm md:text-base leading-relaxed whitespace-pre-wrap">需求沟通 → 设计出图 → 审图报批 → 采购生产 → 搭建施工
+ 3-5天      5-10天      3-7天      7-14天      2-3天
+
+总周期：20-40天
+平均成本：3-8万元/个展位</pre>
+        </div>
+        <div class="p-6 rounded-2xl bg-white/10 border border-white/15">
+          <h3 class="text-xl font-bold">各环节痛点</h3>
+          <ul class="mt-4 space-y-2">
+            <li class="reveal-item">• 需求沟通：信息失真、反复修改</li>
+            <li class="reveal-item">• 设计出图：人工依赖、周期长</li>
+            <li class="reveal-item"><span class="font-semibold text-yellow-300">• 审图报批：</span>60人团队、标准不一、易出错</li>
+            <li class="reveal-item">• 采购生产：手工算料、材料浪费</li>
+            <li class="reveal-item">• 搭建施工：返工率高</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-white/10 border border-white/15">
+        <h3 class="text-xl font-bold">为什么"审图报批"是核心瓶颈？</h3>
+        <ul class="mt-3 space-y-2 opacity-95">
+          <li class="reveal-item">• 规则复杂：安全 / 绿色 / 美学并存，且解释口径不一</li>
+          <li class="reveal-item">• 输入多样：不同设计公司、不同图纸格式、不同表达习惯</li>
+          <li class="reveal-item">• 风险高：安全违规与火灾隐患属于"零容错"</li>
+          <li class="reveal-item">• <strong class="text-yellow-300">60人团队每届审核2.5万份图纸</strong>，人均约400份</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 6: 现有Demo成果展示 - NEW -->
+  <section class="slide bg-gradient-to-br from-emerald-50 to-blue-50">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">DEMO SHOWCASE</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">现有Demo成果展示</h2>
+      <div class="demo-badge mt-4">✨ v1.6 完整原型已完成（2026年1月）</div>
+
+      <div class="mt-10 grid lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-white border shadow-lg">
+          <h3 class="text-2xl font-bold mb-4 text-emerald-600">📊 Demo数据统计</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-semibold">展位方案库</span>
+              <span class="text-2xl font-bold text-emerald-600">48个</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-semibold">尺寸规格</span>
+              <span class="text-2xl font-bold text-blue-600">3种</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-semibold">设计风格</span>
+              <span class="text-2xl font-bold text-purple-600">4类</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-semibold">合规通过率</span>
+              <span class="text-2xl font-bold text-green-600">92%</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-semibold">材料可回收率</span>
+              <span class="text-2xl font-bold text-emerald-600">90%+</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white border shadow-lg">
+          <h3 class="text-2xl font-bold mb-4 text-blue-600">🎯 已实现功能</h3>
+          <div class="space-y-2 text-sm">
+            <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+              <strong>✅ 参展商端</strong>: 48方案浏览、AI生成、合规校验、透明定价、订单确认
+            </div>
+            <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+              <strong>✅ 后台管理</strong>: AI训练工作台、方案审核、候选库管理、数据看板
+            </div>
+            <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+              <strong>✅ 搭建商端</strong>: 订单接收、施工进度上传、资质认证、评价体系
+            </div>
+            <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+              <strong>✅ 架构说明</strong>: 三方协同架构、技术栈、路线图、价值主张
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-white border shadow-lg">
+        <h3 class="text-xl font-bold mb-4">🌐 在线访问（GitHub Pages）</h3>
+        <div class="grid md:grid-cols-2 gap-4 text-sm">
+          <a href="https://raysu1008.github.io/AIGreenExhibition/AIGreenExhibtion.html" target="_blank" class="p-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white rounded-lg hover:shadow-lg transition">
+            <div class="font-bold mb-1">👔 参展商端</div>
+            <div class="text-xs opacity-90">完整设计流程体验</div>
+          </a>
+          <a href="https://raysu1008.github.io/AIGreenExhibition/admin.html" target="_blank" class="p-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition">
+            <div class="font-bold mb-1">🤖 后台管理</div>
+            <div class="text-xs opacity-90">AI训练和审核</div>
+          </a>
+          <a href="https://raysu1008.github.io/AIGreenExhibition/supplier.html" target="_blank" class="p-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:shadow-lg transition">
+            <div class="font-bold mb-1">🏗️ 搭建商端</div>
+            <div class="text-xs opacity-90">订单和施工管理</div>
+          </a>
+          <a href="https://raysu1008.github.io/AIGreenExhibition/architecture.html" target="_blank" class="p-4 bg-gradient-to-r from-slate-600 to-slate-800 text-white rounded-lg hover:shadow-lg transition">
+            <div class="font-bold mb-1">📐 架构说明</div>
+            <div class="text-xs opacity-90">技术架构和商业模式</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-8 p-6 rounded-2xl bg-emerald-100 border border-emerald-200">
+        <p class="text-gray-800"><span class="font-semibold">重要说明：</span>现有Demo已完整实现三方协同闭环，可直接用于客户演示和投资路演。Phase 1将基于此原型进行功能完善和商业化部署。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7-10: 保留原v1的痛点、愿景、价值等slides，略作调整 -->
+  <!-- 这里省略重复内容，保持与v1类似结构 -->
+
+  <!-- Slide 17: 三阶段演进路线图 - ENHANCED -->
+  <section class="slide bg-gradient-to-br from-slate-900 via-indigo-900 to-emerald-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-200">ROADMAP</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">三阶段演进路线图</h2>
+      <div class="demo-badge mt-4">📊 基于Demo原型的实际规划</div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-white/10 border border-white/15">
+        <pre class="text-sm md:text-base leading-relaxed whitespace-pre-wrap">Phase 1              Phase 2              Phase 3
+MVP验证期            平台扩展期            生态赋能期
+(0-12个月)           (12-24个月)          (24个月+)
+2026.1-2026.12       2027.1-2027.12       2028年+
+    │                    │                    │
+    ▼                    ▼                    ▼
+ 小展位闭环          全品类覆盖           行业基础设施
+ 单展会试点          多展会推广           API生态开放
+ 200-500订单         2000-5000订单        10000+订单/年</pre>
+      </div>
+
+      <div class="mt-10 grid lg:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-white/10 border border-white/15">
+          <div class="text-sm font-bold text-emerald-100">Phase 1（0-12个月）</div>
+          <h3 class="text-xl font-bold mt-2">MVP验证期</h3>
+          <ul class="mt-3 space-y-2 opacity-95 text-sm">
+            <li class="reveal-item">• 18-36㎡小型展位</li>
+            <li class="reveal-item">• 广交会单展会试点</li>
+            <li class="reveal-item">• 200-500个订单</li>
+            <li class="reveal-item">• 合规率≥95%</li>
+            <li class="reveal-item">• <strong>预算: ¥280-350万</strong></li>
+            <li class="reveal-item">• <strong>团队: 15-18人</strong></li>
+          </ul>
+        </div>
+        <div class="p-6 rounded-2xl bg-white/10 border border-white/15">
+          <div class="text-sm font-bold text-emerald-100">Phase 2（12-24个月）</div>
+          <h3 class="text-xl font-bold mt-2">平台扩展期</h3>
+          <ul class="mt-3 space-y-2 opacity-95 text-sm">
+            <li class="reveal-item">• 全品类展位（18-100㎡）</li>
+            <li class="reveal-item">• 拓展至5-10个展会</li>
+            <li class="reveal-item">• 2000-5000个订单</li>
+            <li class="reveal-item">• 3D实时预览+VR</li>
+            <li class="reveal-item">• <strong>预算: ¥500-650万</strong></li>
+            <li class="reveal-item">• <strong>团队: 25-30人</strong></li>
+          </ul>
+        </div>
+        <div class="p-6 rounded-2xl bg-white/10 border border-white/15">
+          <div class="text-sm font-bold text-emerald-100">Phase 3（24个月+）</div>
+          <h3 class="text-xl font-bold mt-2">生态赋能期</h3>
+          <ul class="mt-3 space-y-2 opacity-95 text-sm">
+            <li class="reveal-item">• 全国50+展会</li>
+            <li class="reveal-item">• 10000+订单/年</li>
+            <li class="reveal-item">• API开放生态</li>
+            <li class="reveal-item">• 行业SaaS化</li>
+            <li class="reveal-item">• <strong>预算: ¥1000-1500万</strong></li>
+            <li class="reveal-item">• <strong>团队: 40-50人</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-white/10 border border-white/15">
+        <h3 class="text-xl font-bold">💰 三阶段总投资预估</h3>
+        <div class="mt-4 text-lg">
+          <span class="font-bold text-yellow-300">¥1780万 - ¥2500万</span>
+          <span class="ml-4 opacity-90">（24-36个月）</span>
+        </div>
+        <p class="mt-2 text-sm opacity-90">成本分摊: 广交会（主导）+ 世福集团（市场）+ TB团队（技术）</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 23: Phase 1 MVP详细规划 - DETAILED -->
+  <section class="slide bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">PHASE 1 DETAILS</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">Phase 1: MVP详细规划</h2>
+      <div class="demo-badge mt-4">📅 2026年1月 - 2026年12月（12个月）</div>
+
+      <div class="mt-10 grid lg:grid-cols-2 gap-6">
+        <div class="p-6 rounded-2xl bg-emerald-50 border border-emerald-100">
+          <h3 class="text-xl font-bold mb-4">🎯 业务目标</h3>
+          <ul class="space-y-2 text-sm">
+            <li>✅ 覆盖范围: 18-36㎡小型展位（80%需求）</li>
+            <li>✅ 服务数量: 200-500个展位订单</li>
+            <li>✅ 合规率: ≥95%一次性通过</li>
+            <li>✅ 满意度: NPS评分≥60</li>
+            <li>✅ 闭环验证: 设计→审核→搭建全流程</li>
+          </ul>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-blue-50 border border-blue-100">
+          <h3 class="text-xl font-bold mb-4">🔬 技术目标</h3>
+          <ul class="space-y-2 text-sm">
+            <li>✅ AI审图准确率≥85%</li>
+            <li>✅ 平台响应时间<3秒</li>
+            <li>✅ 系统可用性≥99.5%</li>
+            <li>✅ 候选库规模: 100-200个方案</li>
+            <li>✅ Bug密度: <5个/千行代码</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-slate-50 border">
+        <h3 class="text-xl font-bold mb-4">📅 四大里程碑</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-emerald-100">
+              <tr>
+                <th class="p-3">里程碑</th>
+                <th class="p-3">时间节点</th>
+                <th class="p-3">交付成果</th>
+                <th class="p-3">验收标准</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              <tr>
+                <td class="p-3 font-bold">M1: 需求梳理</td>
+                <td class="p-3">Month 1-2</td>
+                <td class="p-3">需求文档、技术方案、原型设计</td>
+                <td class="p-3">三方确认签字</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold">M2: 系统开发</td>
+                <td class="p-3">Month 3-6</td>
+                <td class="p-3">前端、后台、AI模块上线</td>
+                <td class="p-3">功能测试通过</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold">M3: 小范围试点</td>
+                <td class="p-3">Month 7-9</td>
+                <td class="p-3">服务50-100个展位</td>
+                <td class="p-3">Bug率<5%</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold">M4: 正式推广</td>
+                <td class="p-3">Month 10-12</td>
+                <td class="p-3">服务200-500个展位</td>
+                <td class="p-3">满意度≥60</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-amber-50 border border-amber-100">
+        <h3 class="text-xl font-bold mb-4">💰 成本预算: ¥280-350万</h3>
+        <div class="grid md:grid-cols-4 gap-4 text-sm">
+          <div class="p-4 bg-white rounded-lg border">
+            <div class="font-bold text-emerald-600">人力成本</div>
+            <div class="text-2xl font-bold mt-2">¥180-220万</div>
+            <div class="text-xs text-gray-600 mt-1">64-63%</div>
+          </div>
+          <div class="p-4 bg-white rounded-lg border">
+            <div class="font-bold text-blue-600">技术成本</div>
+            <div class="text-2xl font-bold mt-2">¥50-70万</div>
+            <div class="text-xs text-gray-600 mt-1">18-20%</div>
+          </div>
+          <div class="p-4 bg-white rounded-lg border">
+            <div class="font-bold text-purple-600">运营成本</div>
+            <div class="text-2xl font-bold mt-2">¥30-40万</div>
+            <div class="text-xs text-gray-600 mt-1">11%</div>
+          </div>
+          <div class="p-4 bg-white rounded-lg border">
+            <div class="font-bold text-amber-600">其他成本</div>
+            <div class="text-2xl font-bold mt-2">¥20-30万</div>
+            <div class="text-xs text-gray-600 mt-1">7-9%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 36: 三方协作与资源投入 - NEW -->
+  <section class="slide bg-gradient-to-br from-emerald-50 to-blue-50">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full">
+      <p class="text-sm font-semibold uppercase tracking-widest text-emerald-600">COLLABORATION</p>
+      <h2 class="text-3xl md:text-5xl font-bold mt-2">三方协作与资源投入</h2>
+      <div class="demo-badge mt-4">🤝 广交会 × 世福集团 × TB技术团队</div>
+
+      <div class="mt-10 grid lg:grid-cols-3 gap-6">
+        <div class="p-6 rounded-2xl bg-white border shadow-lg">
+          <div class="text-4xl mb-4">🏛️</div>
+          <h3 class="text-2xl font-bold mb-4 text-emerald-600">广交会</h3>
+          <div class="space-y-3 text-sm">
+            <div class="p-3 bg-emerald-50 rounded-lg">
+              <strong>投资比例（Phase 1）</strong>
+              <div class="text-2xl font-bold text-emerald-600">40%</div>
+              <div class="text-xs text-gray-600">¥112-140万</div>
+            </div>
+            <div class="mt-4">
+              <strong class="block mb-2">核心资源：</strong>
+              <ul class="space-y-1 text-gray-700">
+                <li>• 审核规则和标准</li>
+                <li>• 官方推荐渠道</li>
+                <li>• 2.5万参展商资源</li>
+                <li>• 项目总监1人</li>
+                <li>• 审核专家2人（兼职）</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white border shadow-lg">
+          <div class="text-4xl mb-4">🏢</div>
+          <h3 class="text-2xl font-bold mb-4 text-blue-600">世福集团</h3>
+          <div class="space-y-3 text-sm">
+            <div class="p-3 bg-blue-50 rounded-lg">
+              <strong>投资比例（Phase 1）</strong>
+              <div class="text-2xl font-bold text-blue-600">35%</div>
+              <div class="text-xs text-gray-600">¥98-122.5万</div>
+            </div>
+            <div class="mt-4">
+              <strong class="block mb-2">核心资源：</strong>
+              <ul class="space-y-1 text-gray-700">
+                <li>• 搭建商资质数据</li>
+                <li>• 材料供应链资源</li>
+                <li>• 业务运营团队</li>
+                <li>• 产品经理1人</li>
+                <li>• 运营经理1人</li>
+                <li>• 客服团队2人</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-white border shadow-lg">
+          <div class="text-4xl mb-4">💻</div>
+          <h3 class="text-2xl font-bold mb-4 text-purple-600">TB技术团队</h3>
+          <div class="space-y-3 text-sm">
+            <div class="p-3 bg-purple-50 rounded-lg">
+              <strong>投资比例（Phase 1）</strong>
+              <div class="text-2xl font-bold text-purple-600">25%</div>
+              <div class="text-xs text-gray-600">¥70-87.5万</div>
+            </div>
+            <div class="mt-4">
+              <strong class="block mb-2">核心资源：</strong>
+              <ul class="space-y-1 text-gray-700">
+                <li>• 技术开发能力</li>
+                <li>• AI算法和模型</li>
+                <li>• 云服务基础设施</li>
+                <li>• 技术负责人1人</li>
+                <li>• 开发团队8-10人</li>
+                <li>• 已完成Demo原型</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-white border shadow-lg">
+        <h3 class="text-xl font-bold mb-4">👥 核心团队架构（15-18人）</h3>
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+          <div>
+            <div class="font-bold text-emerald-600 mb-3">项目管理层（3人）</div>
+            <ul class="space-y-1 text-gray-700">
+              <li>• 项目总监（广交会）- 全职</li>
+              <li>• 产品经理（世福）- 全职</li>
+              <li>• 技术负责人（TB）- 全职</li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-bold text-blue-600 mb-3">技术团队（8-10人）</div>
+            <ul class="space-y-1 text-gray-700">
+              <li>• 前端工程师 - 2人</li>
+              <li>• 后端工程师 - 2人</li>
+              <li>• AI工程师 - 1-2人</li>
+              <li>• 测试工程师 - 1人</li>
+              <li>• DevOps - 1人（兼）</li>
+              <li>• UI/UX设计师 - 1人（兼）</li>
+            </ul>
+          </div>
+          <div>
+            <div class="font-bold text-purple-600 mb-3">运营团队（4-5人）</div>
+            <ul class="space-y-1 text-gray-700">
+              <li>• 运营经理 - 1人</li>
+              <li>• 数据标注员 - 2人（外）</li>
+              <li>• 客服专员 - 2人（外）</li>
+              <li>• 市场推广 - 1人（兼）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 p-6 rounded-2xl bg-emerald-100 border border-emerald-200">
+        <h3 class="text-xl font-bold mb-2">🤝 协作机制</h3>
+        <ul class="space-y-1 text-sm text-gray-800">
+          <li>• <strong>日常沟通</strong>: 微信群、钉钉群（即时）</li>
+          <li>• <strong>周会</strong>: 每周一上午（进度同步）</li>
+          <li>• <strong>月会</strong>: 每月第一周（总结和规划）</li>
+          <li>• <strong>季度会</strong>: 每季度末（战略复盘）</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 其他slides保持与v1类似，但增加更多细节和Demo相关内容 -->
+  <!-- 省略部分重复内容 -->
+
+  <!-- 最后一页: 结语 -->
+  <section class="slide bg-gradient-to-br from-slate-900 via-emerald-900 to-teal-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-16 w-full text-center">
+      <h2 class="text-4xl md:text-6xl font-extrabold mb-8">结语</h2>
+      
+      <div class="text-xl md:text-2xl font-light leading-relaxed space-y-6 max-w-4xl mx-auto">
+        <p>我们不是在"卖软件"，而是在<span class="font-bold text-yellow-300">共建行业基础设施</span>。</p>
+        <p>从广交会出发，用AI重构"设计—审核—搭建"全链条，</p>
+        <p>让每一个展位都合规、高效、绿色。</p>
+      </div>
+
+      <div class="mt-12 p-8 rounded-2xl bg-white/10 border border-white/15 max-w-3xl mx-auto">
+        <p class="text-2xl font-bold mb-4">✨ 现在，我们已有完整Demo原型</p>
+        <p class="text-lg opacity-90">48个方案 × 三方协同 × AI智能审核</p>
+        <p class="text-lg opacity-90 mt-2">下一步，让我们携手将愿景变为现实！</p>
+      </div>
+
+      <div class="mt-12 text-lg opacity-80">
+        <p>感谢您的聆听！</p>
+        <p class="mt-2">期待您的反馈与建议。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation -->
+  <div id="navigation">
+    <div id="progress-bar"></div>
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <button id="prev-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        ← 上一页
+      </button>
+      <div id="slide-counter" class="text-sm font-semibold text-gray-700">1 / 1</div>
+      <button id="next-btn" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        下一页 →
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  window.onload = () => {
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const counter = document.getElementById('slide-counter');
+    const progressBar = document.getElementById('progress-bar');
+
+    const total = slides.length;
+    let current = 0;
+
+    const showSlide = (n) => {
+      slides.forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      });
+
+      slides[n].classList.add('active');
+      slides[n].style.display = 'flex';
+
+      document.getElementById('presentation-container').scrollTop = 0;
+      counter.textContent = `${n + 1} / ${total}`;
+      progressBar.style.width = `${((n + 1) / total * 100).toFixed(1)}%`;
+
+      prevBtn.disabled = n === 0;
+
+      const hasHiddenItems = slides[n].querySelectorAll('.reveal-item:not(.visible)').length > 0;
+      nextBtn.disabled = (n === total - 1) && !hasHiddenItems;
+
+      slides[n].querySelectorAll('.reveal-item').forEach(el => el.classList.remove('visible'));
+    };
+
+    const revealNext = () => {
+      const hidden = slides[current].querySelectorAll('.reveal-item:not(.visible)');
+      if (hidden.length > 0) {
+        hidden[0].classList.add('visible');
+        return true;
+      }
+      return false;
+    };
+
+    const next = () => {
+      if (revealNext()) return;
+      if (current < total - 1) {
+        current++;
+        showSlide(current);
+      }
+    };
+
+    const prev = () => {
+      if (current > 0) {
+        current--;
+        showSlide(current);
+      }
+    };
+
+    // In-deck TOC jumps
+    document.querySelectorAll('[data-goto]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = parseInt(a.getAttribute('data-goto'));
+        current = target;
+        showSlide(current);
+      });
+    });
+
+    nextBtn.onclick = next;
+    prevBtn.onclick = prev;
+
+    document.addEventListener('keydown', e => {
+      if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        next();
+      }
+      if (['ArrowLeft', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        prev();
+      }
+    });
+
+    showSlide(0);
+  };
+</script>
+
+</body>
+</html>
