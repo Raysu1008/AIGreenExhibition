@@ -3728,6 +3728,26 @@
         const frontCanvas = document.getElementById('preview-front');
         const leftCanvas = document.getElementById('preview-left');
         const rightCanvas = document.getElementById('preview-right');
+        
+        // 初始化Canvas尺寸
+        function initCanvases() {
+            [frontCanvas, leftCanvas, rightCanvas].forEach(canvas => {
+                if (canvas) {
+                    canvas.width = canvas.clientWidth || 300;
+                    canvas.height = canvas.clientHeight || 200;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#f8f9fa';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#999';
+                    ctx.font = '14px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('点击"AI生成预览"查看效果', canvas.width/2, canvas.height/2);
+                }
+            });
+        }
+        
+        // 页面加载时初始化
+        setTimeout(initCanvases, 500);
 
         /* ===== 语言切换 ===== */
         let currentLanguage = 'zh';
@@ -3898,114 +3918,151 @@
         }
 
         async function applyCustomization(event) {
+            console.log('🎬 开始AI生成预览...');
+            
             // 显示加载动画
             const btnEle = event ? event.target : document.querySelector('button[onclick*="applyCustomization"]');
+            if (!btnEle) {
+                console.error('❌ 找不到按钮元素');
+                return;
+            }
+            
             const originalText = btnEle.innerHTML;
             btnEle.disabled = true;
             btnEle.innerHTML = '<span class="loading-spinner"></span> ' + (currentLanguage === 'en' ? 'Generating...' : '生成中...');
 
-            // 获取用户输入的提示词
-            const prompt = document.getElementById('prompt-text').value;
-            console.log('用户提示词:', prompt);
+            try {
+                // 获取用户输入的提示词
+                const prompt = document.getElementById('prompt-text').value;
+                console.log('📝 用户提示词:', prompt);
 
-            // 根据提示词匹配场景图片
-            const scenario = matchScenarioImages(prompt);
-            const imagesToShow = scenario.images;
-            const imageTitles = scenario.titles;
+                // 根据提示词匹配场景图片
+                const scenario = matchScenarioImages(prompt);
+                const imagesToShow = scenario.images;
+                const imageTitles = scenario.titles;
 
-            console.log('将显示图片数量:', imagesToShow.length);
-            console.log('图片标题:', imageTitles);
+                console.log('🖼️ 将显示图片数量:', imagesToShow.length);
+                console.log('🏷️ 图片标题:', imageTitles);
 
-            const canvases = [frontCanvas, leftCanvas, rightCanvas];
+                const canvases = [frontCanvas, leftCanvas, rightCanvas];
+                console.log('🎨 Canvas元素:', canvases.map(c => c ? 'OK' : 'NULL'));
 
-            // 在 canvas 上显示所有三张图片
-            for (let idx = 0; idx < canvases.length; idx++) {
-                const canvas = canvases[idx];
-                const ctx = canvas.getContext('2d');
-                const w = canvas.width = canvas.clientWidth;
-                const h = canvas.height = canvas.clientHeight;
-                ctx.clearRect(0, 0, w, h);
+                // 在 canvas 上显示所有三张图片
+                for (let idx = 0; idx < canvases.length; idx++) {
+                    const canvas = canvases[idx];
+                    if (!canvas) {
+                        console.error(`❌ Canvas ${idx} 不存在`);
+                        continue;
+                    }
+                    
+                    const ctx = canvas.getContext('2d');
+                    const w = canvas.width = canvas.clientWidth || 300;
+                    const h = canvas.height = canvas.clientHeight || 200;
+                    ctx.clearRect(0, 0, w, h);
+                    
+                    console.log(`📐 Canvas ${idx} 尺寸: ${w}x${h}`);
 
-                // 始终显示三张图片
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                await new Promise((resolve) => {
-                    img.onload = () => {
-                        // 计算适配尺寸
-                        const scale = Math.min(w / img.width, h / img.height);
-                        const dw = img.width * scale;
-                        const dh = img.height * scale;
-                        const x = (w - dw) / 2;
-                        const y = (h - dh) / 2;
+                    // 始终显示三张图片
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    
+                    await new Promise((resolve) => {
+                        img.onload = () => {
+                            console.log(`✅ 图片 ${idx} 加载成功:`, imagesToShow[idx]);
+                            // 计算适配尺寸
+                            const scale = Math.min(w / img.width, h / img.height);
+                            const dw = img.width * scale;
+                            const dh = img.height * scale;
+                            const x = (w - dw) / 2;
+                            const y = (h - dh) / 2;
+                            
+                            // 绘制图片
+                            ctx.drawImage(img, x, y, dw, dh);
+                            
+                            // 添加标题
+                            ctx.fillStyle = '#7c3aed';
+                            ctx.font = 'bold 14px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.globalAlpha = 0.9;
+                            const title = imageTitles[idx] || `方案${idx + 1}`;
+                            ctx.fillText(title, w/2, 25);
+                            ctx.globalAlpha = 1.0;
+                            
+                            resolve();
+                        };
+                        img.onerror = (e) => {
+                            console.error(`❌ 图片 ${idx} 加载失败:`, imagesToShow[idx], e);
+                            // 显示占位符
+                            ctx.fillStyle = '#f8f9fa';
+                            ctx.fillRect(0, 0, w, h);
+                            ctx.fillStyle = '#7f8c8d';
+                            ctx.font = '14px sans-serif';
+                            ctx.textAlign = 'center';
+                            ctx.fillText('图片加载失败', w/2, h/2 - 10);
+                            ctx.fillText('请检查网络连接', w/2, h/2 + 10);
+                            resolve();
+                        };
                         
-                        // 绘制图片
-                        ctx.drawImage(img, x, y, dw, dh);
-                        
-                        // 添加标题
-                        ctx.fillStyle = '#7c3aed';
-                        ctx.font = 'bold 14px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.globalAlpha = 0.9;
-                        const title = imageTitles[idx] || `方案${idx + 1}`;
-                        ctx.fillText(title, w/2, 25);
-                        ctx.globalAlpha = 1.0;
-                        
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        // 如果加载失败，显示占位符
-                        ctx.fillStyle = '#f8f9fa';
-                        ctx.fillRect(0, 0, w, h);
-                        ctx.fillStyle = '#7f8c8d';
-                        ctx.font = '14px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('加载中...', w/2, h/2);
-                        resolve();
-                    };
-                    img.src = imagesToShow[idx];
-                });
-            }
-
-            // 显示第一张图片作为主效果图
-            const aiOutputImg = document.getElementById('ai-output-image');
-            if (aiOutputImg && imagesToShow.length > 0) {
-                aiOutputImg.src = imagesToShow[0];
-                const aiOutputSection = document.getElementById('ai-output-section');
-                if (aiOutputSection) {
-                    aiOutputSection.style.display = 'block';
-                    // 滚动到AI输出区域
-                    setTimeout(() => {
-                        aiOutputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }, 100);
+                        console.log(`🔄 开始加载图片 ${idx}:`, imagesToShow[idx]);
+                        img.src = imagesToShow[idx];
+                    });
                 }
+
+                // 显示第一张图片作为主效果图
+                const aiOutputImg = document.getElementById('ai-output-image');
+                if (aiOutputImg && imagesToShow.length > 0) {
+                    aiOutputImg.src = imagesToShow[0];
+                    console.log('🎯 设置主效果图:', imagesToShow[0]);
+                    
+                    const aiOutputSection = document.getElementById('ai-output-section');
+                    if (aiOutputSection) {
+                        aiOutputSection.style.display = 'block';
+                        console.log('✅ 显示AI输出区域');
+                        // 滚动到AI输出区域
+                        setTimeout(() => {
+                            aiOutputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }, 100);
+                    }
+                } else {
+                    console.error('❌ AI输出图片元素不存在或图片列表为空');
+                }
+                
+                console.log('🎉 AI生成预览完成！');
+                
+            } catch (error) {
+                console.error('❌ AI生成预览出错:', error);
+                alert('生成预览时出错，请查看控制台日志');
             }
 
             // 恢复按钮状态
             setTimeout(() => {
                 btnEle.disabled = false;
                 btnEle.innerHTML = originalText;
+                console.log('🔄 按钮状态已恢复');
             }, 1500);
             
             // log customization
-            const primary = document.getElementById('color-primary').value;
-            const secondary = document.getElementById('color-secondary').value;
-            const userPrompt = document.getElementById('prompt-text').value;
-            const spotlightCount = document.getElementById('spotlight-count').value;
-            const whitelightCount = document.getElementById('whitelight-count').value;
-            const materialGrade = document.getElementById('material-grade').value;
-            
-            customizationLogs.push({
-                time: new Date().toISOString(),
-                template: selectedTemplateName,
-                scenario: currentScenario,
-                colors: { primary, secondary },
-                logo: !!document.getElementById('logo-upload').files[0],
-                lighting: { spotlight: spotlightCount, whitelight: whitelightCount },
-                material: materialGrade,
-                prompt: userPrompt,
-                generatedImages: imagesToShow,
-                matchedScenario: scenario
-            });
+            try {
+                const primary = document.getElementById('color-primary').value;
+                const secondary = document.getElementById('color-secondary').value;
+                const userPrompt = document.getElementById('prompt-text').value;
+                const spotlightCount = document.getElementById('spotlight-count').value;
+                const whitelightCount = document.getElementById('whitelight-count').value;
+                const materialGrade = document.getElementById('material-grade').value;
+                
+                customizationLogs.push({
+                    time: new Date().toISOString(),
+                    template: selectedTemplateName,
+                    scenario: currentScenario,
+                    colors: { primary, secondary },
+                    logo: !!document.getElementById('logo-upload').files[0],
+                    lighting: { spotlight: spotlightCount, whitelight: whitelightCount },
+                    material: materialGrade,
+                    prompt: userPrompt
+                });
+            } catch (logError) {
+                console.error('日志记录失败:', logError);
+            }
         }
 
         function saveSnapshot() {
@@ -4399,22 +4456,30 @@
             const quickDiv = document.getElementById(stepId + '-quick');
             const summaryDiv = document.getElementById(stepId + '-summary');
             
-            if (chatDiv.style.display === 'none') {
+            // 安全检查：确保元素存在
+            if (!chatDiv || !inputDiv || !quickDiv) {
+                console.error('AI Chat 元素未找到:', stepId);
+                return;
+            }
+            
+            if (chatDiv.style.display === 'none' || chatDiv.style.display === '') {
                 // 显示聊天界面
                 chatDiv.style.display = 'block';
                 inputDiv.style.display = 'flex';
                 quickDiv.style.display = 'flex';
-                summaryDiv.style.display = 'none';
+                if (summaryDiv) summaryDiv.style.display = 'none';
                 
                 // 如果是第一次打开，添加欢迎消息
                 const messagesDiv = document.getElementById(stepId + '-messages');
-                if (messagesDiv.children.length === 0) {
+                if (messagesDiv && messagesDiv.children.length === 0) {
                     const welcomeMsg = getWelcomeMessage(stepId);
                     addAIMessage(stepId, welcomeMsg, false);
                 }
                 
                 // 滚动到底部
-                setTimeout(() => chatDiv.scrollTop = chatDiv.scrollHeight, 100);
+                setTimeout(() => {
+                    if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+                }, 100);
             } else {
                 // 隐藏聊天界面
                 chatDiv.style.display = 'none';
