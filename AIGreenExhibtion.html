@@ -4908,6 +4908,37 @@
             return isEn ? stepReplies.default.en : stepReplies.default.zh;
         }
 
+        // ============= 确保函数暴露到全局作用域 =============
+        console.log('🔧 初始化全局函数...');
+        
+        // 将关键函数暴露到window对象
+        window.setLanguage = setLanguage;
+        window.toggleEmbeddedChat = toggleEmbeddedChat;
+        window.applyCustomization = applyCustomization;
+        window.toggleAIChat = toggleAIChat;
+        window.filterTemplates = filterTemplates;
+        window.selectTemplate = selectTemplate;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.previewImage = previewImage;
+        window.closeImagePreview = closeImagePreview;
+        
+        console.log('✅ 全局函数已暴露:');
+        console.log('  - setLanguage:', typeof window.setLanguage);
+        console.log('  - toggleEmbeddedChat:', typeof window.toggleEmbeddedChat);
+        console.log('  - applyCustomization:', typeof window.applyCustomization);
+        console.log('  - toggleAIChat:', typeof window.toggleAIChat);
+        
+        // 页面加载完成后的初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOMContentLoaded - 页面加载完成');
+            console.log('✅ 检查关键元素:');
+            console.log('  - lang-zh button:', document.getElementById('lang-zh') ? '✅' : '❌');
+            console.log('  - lang-en button:', document.getElementById('lang-en') ? '✅' : '❌');
+            console.log('  - embedded-chat-panel:', document.getElementById('embedded-chat-panel') ? '✅' : '❌');
+            console.log('  - preview-front canvas:', document.getElementById('preview-front') ? '✅' : '❌');
+        });
+
     </script>
 
     <!-- 详情模态框 -->

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>按钮测试</title></head>
+<body style="padding: 40px;">
+<h1>按钮功能测试</h1>
+<p>打开浏览器控制台（F12）查看错误信息</p>
+
+<button onclick="alert('onclick works!'); testFunc1();" style="padding: 10px 20px; margin: 10px; font-size: 16px;">测试按钮1</button>
+<button onclick="testFunc2()" style="padding: 10px 20px; margin: 10px; font-size: 16px;">测试按钮2</button>
+<button onclick="testFunc3(event)" style="padding: 10px 20px; margin: 10px; font-size: 16px;">测试按钮3 (with event)</button>
+
+<div id="result" style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 5px;"></div>
+
+<script>
+console.log('✅ Script标签加载成功');
+
+function testFunc1() {
+    console.log('✅ testFunc1 被调用');
+    document.getElementById('result').innerHTML += '<div>✅ 函数1工作正常</div>';
+}
+
+function testFunc2() {
+    console.log('✅ testFunc2 被调用');
+    document.getElementById('result').innerHTML += '<div>✅ 函数2工作正常</div>';
+}
+
+function testFunc3(event) {
+    console.log('✅ testFunc3 被调用, event:', event);
+    document.getElementById('result').innerHTML += '<div>✅ 函数3工作正常 (with event)</div>';
+}
+
+// 测试是否能在window对象上调用
+window.testFunc1 = testFunc1;
+window.testFunc2 = testFunc2;
+window.testFunc3 = testFunc3;
+
+console.log('✅ 所有函数已定义');
+console.log('testFunc1:', typeof testFunc1);
+console.log('testFunc2:', typeof testFunc2);
+console.log('testFunc3:', typeof testFunc3);
+</script>
+
+<hr>
+<h2>现在测试主页面的函数</h2>
+<button onclick="parent.setLanguage('en')" style="padding: 10px 20px; margin: 10px; font-size: 16px;">调用主页面 setLanguage</button>
+<button onclick="parent.toggleEmbeddedChat(true)" style="padding: 10px 20px; margin: 10px; font-size: 16px;">调用主页面 toggleEmbeddedChat</button>
+<button onclick="parent.applyCustomization(event)" style="padding: 10px 20px; margin: 10px; font-size: 16px;">调用主页面 applyCustomization</button>
+
+</body>
+</html>
