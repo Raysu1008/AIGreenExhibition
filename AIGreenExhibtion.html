@@ -892,6 +892,157 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
+        /* 3D视图按钮样式 */
+        .view-3d-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-3d-button:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .view-3d-button:active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* 3D容器样式 */
+        .preview-3d-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .preview-3d-container.active {
+            display: flex;
+        }
+
+        .preview-3d-card {
+            width: 80%;
+            max-width: 800px;
+            height: 70%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .preview-3d-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .preview-3d-face img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* 正面 */
+        .preview-3d-face.front {
+            transform: translateZ(0px);
+        }
+
+        /* 左侧 */
+        .preview-3d-face.left {
+            transform: rotateY(-120deg) translateZ(400px);
+        }
+
+        /* 右侧 */
+        .preview-3d-face.right {
+            transform: rotateY(120deg) translateZ(400px);
+        }
+
+        /* 3D控制按钮 */
+        .preview-3d-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .preview-3d-control-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .preview-3d-control-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-3d-control-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .preview-3d-exit-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e74c3c;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        .preview-3d-exit-btn:hover {
+            background: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -4701,6 +4852,10 @@
 
         // ====== 图片放大预览功能 ======
         
+        let current3DRotation = 0; // 当前3D旋转角度
+        let autoRotateInterval = null; // 自动旋转定时器
+        let currentTemplateId = null; // 当前展位ID
+        
         function previewImage(imageSrc, caption) {
             const modal = document.getElementById('image-preview-modal');
             const modalImg = document.getElementById('preview-image');
@@ -4710,16 +4865,160 @@
             modalImg.src = imageSrc;
             captionText.textContent = caption || '';
             
+            // 从caption中提取展位ID (例如: "T001")
+            if (caption) {
+                const match = caption.match(/T\d{3}/);
+                if (match) {
+                    currentTemplateId = match[0];
+                    console.log('📸 当前展位:', currentTemplateId);
+                }
+            }
+            
             // 防止背景滚动
             document.body.style.overflow = 'hidden';
+            
+            // 重置3D视图
+            toggle3DView(false);
         }
         
         function closeImagePreview() {
             const modal = document.getElementById('image-preview-modal');
             modal.classList.remove('show');
             
+            // 停止自动旋转
+            stopAutoRotate();
+            
             // 恢复背景滚动
             document.body.style.overflow = 'auto';
+            
+            // 重置当前展位ID
+            currentTemplateId = null;
+        }
+        
+        // ====== 3D视图功能 ======
+        
+        function toggle3DView(show) {
+            const view2D = document.getElementById('preview-2d-view');
+            const view3D = document.getElementById('preview-3d-container');
+            
+            if (show) {
+                // 显示3D视图
+                view2D.style.display = 'none';
+                view3D.classList.add('active');
+                
+                // 加载3个视角的图片
+                load3DImages();
+                
+                // 重置旋转角度
+                current3DRotation = 0;
+                updateCardRotation();
+                updateControlButtons();
+                
+                console.log('🎨 已切换到3D视图');
+            } else {
+                // 显示2D视图
+                view2D.style.display = 'block';
+                view3D.classList.remove('active');
+                
+                // 停止自动旋转
+                stopAutoRotate();
+                
+                console.log('🖼️ 已切换到2D视图');
+            }
+        }
+        
+        function load3DImages() {
+            // 获取当前2D图片的路径
+            const currentImage = document.getElementById('preview-image').src;
+            
+            // 如果是展位模板图片，尝试加载对应的3个视角
+            if (currentTemplateId) {
+                const basePath = currentImage.substring(0, currentImage.lastIndexOf('/') + 1);
+                
+                // 假设图片命名规则：
+                // page_XXX.png (正面)
+                // 如果没有专门的3视角图，使用同一张图片
+                document.getElementById('preview-3d-front').src = currentImage;
+                document.getElementById('preview-3d-left').src = currentImage;
+                document.getElementById('preview-3d-right').src = currentImage;
+                
+                console.log('📸 已加载3D视角图片');
+            } else {
+                // 使用当前图片作为所有视角
+                document.getElementById('preview-3d-front').src = currentImage;
+                document.getElementById('preview-3d-left').src = currentImage;
+                document.getElementById('preview-3d-right').src = currentImage;
+            }
+        }
+        
+        function rotate3DCard(viewIndex) {
+            // 停止自动旋转
+            stopAutoRotate();
+            
+            // 设置旋转角度
+            // 0: 正面 (0°)
+            // 1: 左视角 (120°)
+            // 2: 右视角 (-120°)
+            const angles = [0, 120, -120];
+            current3DRotation = angles[viewIndex];
+            
+            updateCardRotation();
+            updateControlButtons();
+            
+            console.log(`🔄 旋转到视角 ${viewIndex}: ${current3DRotation}°`);
+        }
+        
+        function updateCardRotation() {
+            const card = document.getElementById('preview-3d-card');
+            card.style.transform = `rotateY(${current3DRotation}deg)`;
+        }
+        
+        function updateControlButtons() {
+            const buttons = document.querySelectorAll('.preview-3d-control-btn');
+            buttons.forEach((btn, index) => {
+                if (index < 3) { // 只处理前3个按钮（正面/左/右）
+                    const angles = [0, 120, -120];
+                    if (angles[index] === current3DRotation) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+        }
+        
+        function toggleAutoRotate() {
+            const btn = event.target.closest('.preview-3d-control-btn');
+            const text = document.getElementById('auto-rotate-text');
+            
+            if (autoRotateInterval) {
+                // 停止自动旋转
+                stopAutoRotate();
+                text.textContent = '自动旋转';
+                btn.classList.remove('active');
+                console.log('⏸️ 停止自动旋转');
+            } else {
+                // 开始自动旋转
+                btn.classList.add('active');
+                text.textContent = '停止旋转';
+                autoRotateInterval = setInterval(() => {
+                    current3DRotation += 1; // 每次旋转1度
+                    updateCardRotation();
+                }, 30); // 30ms更新一次，实现流畅旋转
+                console.log('▶️ 开始自动旋转');
+            }
+        }
+        
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+                autoRotateInterval = null;
+                
+                const text = document.getElementById('auto-rotate-text');
+                const btn = document.querySelector('.preview-3d-control-btn:last-child');
+                if (text) text.textContent = '自动旋转';
+                if (btn) btn.classList.remove('active');
+            }
         }
         
         // 点击模态框背景关闭
@@ -5029,6 +5328,9 @@
         window.closeModal = closeModal;
         window.previewImage = previewImage;
         window.closeImagePreview = closeImagePreview;
+        window.toggle3DView = toggle3DView;
+        window.rotate3DCard = rotate3DCard;
+        window.toggleAutoRotate = toggleAutoRotate;
         
         console.log('✅ 全局函数已暴露:');
         console.log('  - setLanguage:', typeof window.setLanguage);
@@ -5095,8 +5397,54 @@
     <div id="image-preview-modal" class="image-preview-modal">
         <div class="image-preview-content">
             <button class="image-preview-close" onclick="closeImagePreview()" title="关闭浮窗 (ESC)">&times;</button>
-            <img id="preview-image" src="" alt="预览图片" style="cursor: default;">
-            <div id="preview-caption" class="image-preview-caption"></div>
+            
+            <!-- 2D图片视图 -->
+            <div id="preview-2d-view">
+                <img id="preview-image" src="" alt="预览图片" style="cursor: default;">
+                <div id="preview-caption" class="image-preview-caption"></div>
+                
+                <!-- 3D视图按钮 -->
+                <button class="view-3d-button" onclick="toggle3DView(true)" title="查看3D效果">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                    <span>3D视图</span>
+                </button>
+            </div>
+            
+            <!-- 3D视图容器 -->
+            <div id="preview-3d-container" class="preview-3d-container">
+                <button class="preview-3d-exit-btn" onclick="toggle3DView(false)">
+                    ← 返回2D视图
+                </button>
+                
+                <div id="preview-3d-card" class="preview-3d-card">
+                    <!-- 正面 -->
+                    <div class="preview-3d-face front">
+                        <img id="preview-3d-front" src="" alt="正面视图">
+                    </div>
+                    <!-- 左前角 -->
+                    <div class="preview-3d-face left">
+                        <img id="preview-3d-left" src="" alt="左前角视图">
+                    </div>
+                    <!-- 右前角 -->
+                    <div class="preview-3d-face right">
+                        <img id="preview-3d-right" src="" alt="右前角视图">
+                    </div>
+                </div>
+                
+                <!-- 控制按钮 -->
+                <div class="preview-3d-controls">
+                    <button class="preview-3d-control-btn active" onclick="rotate3DCard(0)">正面</button>
+                    <button class="preview-3d-control-btn" onclick="rotate3DCard(1)">左视角</button>
+                    <button class="preview-3d-control-btn" onclick="rotate3DCard(2)">右视角</button>
+                    <button class="preview-3d-control-btn" onclick="toggleAutoRotate()">
+                        <span id="auto-rotate-text">自动旋转</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
