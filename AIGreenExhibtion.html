@@ -3224,9 +3224,12 @@
     </div>
 
     <script>
-        // ============= 登录功能 =============
+        // ============= 全局变量声明 =============
         let currentUser = null;
+        let embeddedChatOpen = false;
+        let chatRightAligned = false;
 
+        // ============= 登录功能 =============
         // 检查是否已登录
         function checkLogin() {
             const savedUser = sessionStorage.getItem('currentUser');
@@ -4636,9 +4639,6 @@
         });
 
         // ============= 嵌入式聊天面板功能 =============
-        let embeddedChatOpen = false;
-        let chatRightAligned = false;
-        
         function toggleEmbeddedChat(forceRightAlign = false) {
             console.log('toggleEmbeddedChat called, current state:', embeddedChatOpen, 'forceRightAlign:', forceRightAlign);
             const panel = document.getElementById('embedded-chat-panel');
