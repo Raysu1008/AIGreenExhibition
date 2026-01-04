@@ -649,6 +649,41 @@
             border: 1px solid #eee;
             border-radius: 6px;
             background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .preview-canvas:hover {
+            border-color: #7c3aed;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
+            transform: scale(1.02);
+        }
+        
+        .preview-canvas.active {
+            border: 3px solid #7c3aed;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+        
+        .template-card.preview-card {
+            position: relative;
+        }
+        
+        .template-card.preview-card.active::before {
+            content: '✓';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #7c3aed;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 10;
         }
 
         .artifact-grid {
@@ -2611,17 +2646,17 @@
                 </div>
 
                 <div class="template-grid" style="margin-top: 12px;">
-                    <div class="template-card">
+                    <div class="template-card preview-card" data-preview="front">
                         <div class="template-title">正面预览</div>
-                        <canvas id="preview-front" class="preview-canvas"></canvas>
+                        <canvas id="preview-front" class="preview-canvas" data-index="0"></canvas>
                     </div>
-                    <div class="template-card">
+                    <div class="template-card preview-card" data-preview="left">
                         <div class="template-title">左前角预览</div>
-                        <canvas id="preview-left" class="preview-canvas"></canvas>
+                        <canvas id="preview-left" class="preview-canvas" data-index="1"></canvas>
                     </div>
-                    <div class="template-card">
+                    <div class="template-card preview-card" data-preview="right">
                         <div class="template-title">右前角预览</div>
-                        <canvas id="preview-right" class="preview-canvas"></canvas>
+                        <canvas id="preview-right" class="preview-canvas" data-index="2"></canvas>
                     </div>
                 </div>
 
@@ -4035,6 +4070,9 @@
                 
                 console.log('🎉 AI生成预览完成！');
                 
+                // 初始化Canvas点击切换功能
+                setupCanvasPreviewSwitch();
+                
             } catch (error) {
                 console.error('❌ AI生成预览出错:', error);
                 alert('生成预览时出错，请查看控制台日志');
@@ -4076,6 +4114,59 @@
             const titles = ['正面预览', '左前角预览', '右前角预览'];
             snaps.forEach((dataUrl, idx) => artifactImages.push({ title: titles[idx], url: dataUrl }));
             renderArtifacts();
+        }
+        
+        /* ===== Canvas预览切换功能 ===== */
+        function setupCanvasPreviewSwitch() {
+            const canvases = [frontCanvas, leftCanvas, rightCanvas];
+            const previewCards = document.querySelectorAll('.preview-card');
+            const aiOutputImage = document.getElementById('ai-output-image');
+            const aiOutputSection = document.getElementById('ai-output-section');
+            
+            // 默认选中第一个
+            if (previewCards.length > 0) {
+                previewCards[0].classList.add('active');
+            }
+            
+            canvases.forEach((canvas, index) => {
+                if (!canvas) return;
+                
+                canvas.addEventListener('click', function() {
+                    console.log(`🖼️ 切换到预览 ${index + 1}`);
+                    
+                    // 移除所有active类
+                    previewCards.forEach(card => card.classList.remove('active'));
+                    
+                    // 添加active类到当前卡片
+                    if (previewCards[index]) {
+                        previewCards[index].classList.add('active');
+                    }
+                    
+                    // 将Canvas内容转换为图片并显示在下方
+                    try {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        
+                        if (aiOutputImage && dataUrl) {
+                            aiOutputImage.src = dataUrl;
+                            
+                            // 显示AI输出区域（如果还未显示）
+                            if (aiOutputSection) {
+                                aiOutputSection.style.display = 'block';
+                            }
+                            
+                            console.log('✅ 预览图片已切换');
+                        }
+                    } catch (error) {
+                        console.error('❌ 切换预览图片失败:', error);
+                    }
+                });
+                
+                // 添加视觉提示
+                canvas.style.cursor = 'pointer';
+                canvas.title = '点击查看大图';
+            });
+            
+            console.log('✅ Canvas预览切换功能已初始化');
         }
         
         // 模板筛选功能
@@ -4918,6 +5009,7 @@
         window.setLanguage = setLanguage;
         window.toggleEmbeddedChat = toggleEmbeddedChat;
         window.applyCustomization = applyCustomization;
+        window.setupCanvasPreviewSwitch = setupCanvasPreviewSwitch;
         window.toggleAIChat = toggleAIChat;
         window.filterTemplates = filterTemplates;
         window.selectTemplate = selectTemplate;
