@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搭建商工作台 - 广交会AI展位设计平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        /* 导航栏 */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .navbar-menu a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .stat-icon.pending {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.accepted {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-icon.completed {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-icon.rating {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* Tab切换 */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7f8c8d;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 订单列表 */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .order-id {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .order-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-accepted {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-inprogress {
+            background: #cfe2ff;
+            color: #084298;
+        }
+
+        .status-completed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .order-body {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 25px;
+        }
+
+        .order-preview {
+            width: 200px;
+            height: 140px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .order-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .order-details {
+            flex: 1;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 施工进度表单 */
+        .progress-form {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* 图片上传 */
+        .image-upload-area {
+            border: 2px dashed #e9ecef;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        /* 资质认证 */
+        .certification-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .cert-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .cert-verified {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .cert-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .cert-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .cert-item {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cert-icon {
+            font-size: 32px;
+        }
+
+        .cert-info h4 {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .cert-info p {
+            font-size: 13px;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .order-body {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <div class="navbar">
+        <div class="navbar-brand">
+            <i class="bi bi-building"></i> 搭建商工作台
+        </div>
+        <div class="navbar-menu">
+            <a href="AIGreenExhibtion.html">
+                <i class="bi bi-house"></i> 参展商端
+            </a>
+            <a href="admin.html">
+                <i class="bi bi-gear"></i> 后台管理
+            </a>
+            <a href="architecture.html">
+                <i class="bi bi-diagram-3"></i> 架构说明
+            </a>
+            <a href="#" id="profileBtn">
+                <i class="bi bi-person-circle"></i> 个人中心
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 资质认证状态 -->
+        <div class="certification-section">
+            <h2 style="margin-bottom: 15px;">
+                <i class="bi bi-shield-check"></i> 资质认证状态
+            </h2>
+            <div class="cert-status cert-verified">
+                <i class="bi bi-check-circle-fill"></i>
+                已认证 - 优质搭建商
+            </div>
+            <div class="cert-list">
+                <div class="cert-item">
+                    <div class="cert-icon">🏢</div>
+                    <div class="cert-info">
+                        <h4>企业营业执照</h4>
+                        <p>有效期至 2028-12-31</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">🔧</div>
+                    <div class="cert-info">
+                        <h4>施工资质证书</h4>
+                        <p>二级资质 | 编号: GJ2024001</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">🛡️</div>
+                    <div class="cert-info">
+                        <h4>安全生产许可证</h4>
+                        <p>编号: AQ20240156</p>
+                    </div>
+                </div>
+                <div class="cert-item">
+                    <div class="cert-icon">💼</div>
+                    <div class="cert-info">
+                        <h4>保险证明</h4>
+                        <p>责任险 500万元</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon pending">⏰</div>
+                <div class="stat-info">
+                    <div class="stat-label">待处理订单</div>
+                    <div class="stat-value" id="pendingCount">3</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon accepted">🔨</div>
+                <div class="stat-info">
+                    <div class="stat-label">进行中</div>
+                    <div class="stat-value" id="inprogressCount">5</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon completed">✅</div>
+                <div class="stat-info">
+                    <div class="stat-label">已完成</div>
+                    <div class="stat-value" id="completedCount">28</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rating">⭐</div>
+                <div class="stat-info">
+                    <div class="stat-label">综合评分</div>
+                    <div class="stat-value">4.8</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab切换 -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('pending')">
+                <i class="bi bi-clock"></i> 待处理 (3)
+            </button>
+            <button class="tab-btn" onclick="switchTab('inprogress')">
+                <i class="bi bi-hammer"></i> 进行中 (5)
+            </button>
+            <button class="tab-btn" onclick="switchTab('completed')">
+                <i class="bi bi-check-circle"></i> 已完成 (28)
+            </button>
+        </div>
+
+        <!-- 待处理订单 -->
+        <div id="pendingTab" class="tab-content active">
+            <div class="order-list" id="pendingOrders"></div>
+        </div>
+
+        <!-- 进行中订单 -->
+        <div id="inprogressTab" class="tab-content">
+            <div class="order-list" id="inprogressOrders"></div>
+        </div>
+
+        <!-- 已完成订单 -->
+        <div id="completedTab" class="tab-content">
+            <div class="order-list" id="completedOrders"></div>
+        </div>
+    </div>
+
+    <!-- 订单详情Modal -->
+    <div id="orderDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">订单详情</h3>
+                <button class="modal-close" onclick="closeModal('orderDetailModal')">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- 上传进度Modal -->
+    <div id="progressModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">上传施工进度</h3>
+                <button class="modal-close" onclick="closeModal('progressModal')">&times;</button>
+            </div>
+            <div class="progress-form">
+                <div class="form-group">
+                    <label class="form-label">施工阶段</label>
+                    <select class="form-select" id="progressStage">
+                        <option value="基础搭建">基础搭建 (0-30%)</option>
+                        <option value="主体结构">主体结构 (30-60%)</option>
+                        <option value="装饰装修">装饰装修 (60-90%)</option>
+                        <option value="最终验收">最终验收 (90-100%)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">完成进度 (%)</label>
+                    <input type="number" class="form-input" id="progressPercent" min="0" max="100" value="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">进度说明</label>
+                    <textarea class="form-textarea" id="progressDesc" placeholder="请描述当前施工进度和遇到的问题..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">现场照片</label>
+                    <div class="image-upload-area" onclick="document.getElementById('photoInput').click()">
+                        <i class="bi bi-cloud-upload" style="font-size: 48px; color: #667eea;"></i>
+                        <p>点击上传施工现场照片</p>
+                        <p style="font-size: 12px; color: #7f8c8d;">支持 JPG, PNG 格式，最多 6 张</p>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+                    <div class="image-preview-grid" id="photoPreview"></div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn btn-primary" onclick="submitProgress()">
+                        <i class="bi bi-upload"></i> 提交进度
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeModal('progressModal')">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟订单数据
+        const mockOrders = {
+            pending: [
+                {
+                    id: 'GJ2026010501',
+                    exhibitor: '深圳科技有限公司',
+                    template: '科技风展位 - T023',
+                    size: '27㎡ (9m × 3m)',
+                    price: '¥45,000',
+                    deadline: '2026-03-15',
+                    location: '广州·琶洲展馆 A区 3.2馆 B34',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_023.png',
+                    contact: '张经理 | 138****8888',
+                    requirements: '需要LED屏幕、智能照明系统、产品展示柜'
+                },
+                {
+                    id: 'GJ2026010502',
+                    exhibitor: '上海贸易集团',
+                    template: '高端风展位 - T035',
+                    size: '36㎡ (6m × 6m)',
+                    price: '¥68,000',
+                    deadline: '2026-03-20',
+                    location: '广州·琶洲展馆 B区 4.1馆 C15',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_035.png',
+                    contact: '李总 | 159****6666',
+                    requirements: '高端定制、洽谈区、产品陈列、灯光效果'
+                },
+                {
+                    id: 'GJ2026010503',
+                    exhibitor: '北京环保科技',
+                    template: '自然风展位 - T008',
+                    size: '18㎡ (6m × 3m)',
+                    price: '¥28,000',
+                    deadline: '2026-03-18',
+                    location: '广州·琶洲展馆 C区 5.2馆 A20',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_008.png',
+                    contact: '王女士 | 186****9999',
+                    requirements: '强调环保材料、绿植装饰、低碳理念展示'
+                }
+            ],
+            inprogress: [
+                {
+                    id: 'GJ2026010301',
+                    exhibitor: '广东家电集团',
+                    template: '现代风展位 - T012',
+                    size: '18㎡ (6m × 3m)',
+                    progress: 65,
+                    stage: '装饰装修',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_012.png'
+                },
+                {
+                    id: 'GJ2026010302',
+                    exhibitor: '浙江纺织有限公司',
+                    template: '科技风展位 - T028',
+                    size: '27㎡ (9m × 3m)',
+                    progress: 45,
+                    stage: '主体结构',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_028.png'
+                }
+            ],
+            completed: [
+                {
+                    id: 'GJ2025120201',
+                    exhibitor: '江苏机械制造',
+                    template: '高端风展位 - T040',
+                    size: '36㎡ (6m × 6m)',
+                    rating: 5,
+                    completedDate: '2025-12-28',
+                    preview: '环保展位闭环资料251217/PDF导出图片/page_040.png'
+                }
+            ]
+        };
+
+        let uploadedPhotos = [];
+
+        // 初始化页面
+        function initPage() {
+            renderOrders('pending');
+            renderOrders('inprogress');
+            renderOrders('completed');
+        }
+
+        // 渲染订单列表
+        function renderOrders(type) {
+            const container = document.getElementById(`${type}Orders`);
+            const orders = mockOrders[type];
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">暂无订单</p>';
+                return;
+            }
+
+            container.innerHTML = orders.map(order => {
+                if (type === 'pending') {
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">订单编号: ${order.id}</div>
+                                <div class="order-status status-pending">🔔 待接单</div>
+                            </div>
+                            <div class="order-body">
+                                <img src="${order.preview}" alt="展位预览" class="order-preview" onclick="showOrderDetail('${order.id}')">
+                                <div class="order-details">
+                                    <div class="detail-row">
+                                        <div class="detail-label">参展商:</div>
+                                        <div class="detail-value">${order.exhibitor}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">展位方案:</div>
+                                        <div class="detail-value">${order.template}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">展位面积:</div>
+                                        <div class="detail-value">${order.size}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">合同金额:</div>
+                                        <div class="detail-value" style="color: #e74c3c; font-size: 20px;">${order.price}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">完工期限:</div>
+                                        <div class="detail-value">${order.deadline}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">展位位置:</div>
+                                        <div class="detail-value">${order.location}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <button class="btn btn-primary" onclick="acceptOrder('${order.id}')">
+                                    <i class="bi bi-check-circle"></i> 接受订单
+                                </button>
+                                <button class="btn btn-secondary" onclick="showOrderDetail('${order.id}')">
+                                    <i class="bi bi-eye"></i> 查看详情
+                                </button>
+                                <button class="btn btn-danger" onclick="rejectOrder('${order.id}')">
+                                    <i class="bi bi-x-circle"></i> 拒绝订单
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (type === 'inprogress') {
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">订单编号: ${order.id}</div>
+                                <div class="order-status status-inprogress">🔨 施工中</div>
+                            </div>
+                            <div class="order-body">
+                                <img src="${order.preview}" alt="展位预览" class="order-preview">
+                                <div class="order-details">
+                                    <div class="detail-row">
+                                        <div class="detail-label">参展商:</div>
+                                        <div class="detail-value">${order.exhibitor}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">展位方案:</div>
+                                        <div class="detail-value">${order.template}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">当前进度:</div>
+                                        <div class="detail-value">
+                                            <div style="display: flex; align-items: center; gap: 10px;">
+                                                <div style="flex: 1; background: #e9ecef; height: 12px; border-radius: 6px; overflow: hidden;">
+                                                    <div style="width: ${order.progress}%; background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%); height: 100%; transition: width 0.3s;"></div>
+                                                </div>
+                                                <span style="font-weight: bold; color: #667eea;">${order.progress}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">施工阶段:</div>
+                                        <div class="detail-value">${order.stage}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <button class="btn btn-primary" onclick="showProgressModal('${order.id}')">
+                                    <i class="bi bi-upload"></i> 上传进度
+                                </button>
+                                <button class="btn btn-success" onclick="completeOrder('${order.id}')" ${order.progress < 100 ? 'disabled' : ''}>
+                                    <i class="bi bi-check-circle"></i> 提交完工
+                                </button>
+                                <button class="btn btn-secondary" onclick="showOrderDetail('${order.id}')">
+                                    <i class="bi bi-eye"></i> 查看详情
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-id">订单编号: ${order.id}</div>
+                                <div class="order-status status-completed">✅ 已完成</div>
+                            </div>
+                            <div class="order-body">
+                                <img src="${order.preview}" alt="展位预览" class="order-preview">
+                                <div class="order-details">
+                                    <div class="detail-row">
+                                        <div class="detail-label">参展商:</div>
+                                        <div class="detail-value">${order.exhibitor}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">展位方案:</div>
+                                        <div class="detail-value">${order.template}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">完成时间:</div>
+                                        <div class="detail-value">${order.completedDate}</div>
+                                    </div>
+                                    <div class="detail-row">
+                                        <div class="detail-label">客户评价:</div>
+                                        <div class="detail-value">${'⭐'.repeat(order.rating)} (${order.rating}/5)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="order-actions">
+                                <button class="btn btn-secondary" onclick="showOrderDetail('${order.id}')">
+                                    <i class="bi bi-eye"></i> 查看详情
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        // 切换Tab
+        function switchTab(tabName) {
+            // 切换按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // 切换内容
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}Tab`).classList.add('active');
+        }
+
+        // 接受订单
+        function acceptOrder(orderId) {
+            if (confirm('确认接受此订单？\n\n接单后请按时完成施工，并及时更新进度。')) {
+                alert(`✅ 订单 ${orderId} 接受成功！\n\n订单已进入施工阶段，请查看"进行中"标签页。`);
+                // 实际应用中这里会调用API
+                location.reload();
+            }
+        }
+
+        // 拒绝订单
+        function rejectOrder(orderId) {
+            const reason = prompt('请输入拒绝原因：');
+            if (reason) {
+                alert(`订单 ${orderId} 已拒绝\n拒绝原因: ${reason}`);
+                location.reload();
+            }
+        }
+
+        // 显示订单详情
+        function showOrderDetail(orderId) {
+            const order = Object.values(mockOrders).flat().find(o => o.id === orderId);
+            if (!order) return;
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${order.preview}" style="max-width: 100%; border-radius: 12px;">
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">订单编号:</div>
+                    <div class="detail-value">${order.id}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">参展商:</div>
+                    <div class="detail-value">${order.exhibitor}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">展位方案:</div>
+                    <div class="detail-value">${order.template}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">展位面积:</div>
+                    <div class="detail-value">${order.size}</div>
+                </div>
+                ${order.price ? `
+                <div class="detail-row">
+                    <div class="detail-label">合同金额:</div>
+                    <div class="detail-value" style="color: #e74c3c; font-size: 20px;">${order.price}</div>
+                </div>
+                ` : ''}
+                ${order.location ? `
+                <div class="detail-row">
+                    <div class="detail-label">展位位置:</div>
+                    <div class="detail-value">${order.location}</div>
+                </div>
+                ` : ''}
+                ${order.contact ? `
+                <div class="detail-row">
+                    <div class="detail-label">联系方式:</div>
+                    <div class="detail-value">${order.contact}</div>
+                </div>
+                ` : ''}
+                ${order.requirements ? `
+                <div class="detail-row">
+                    <div class="detail-label">特殊要求:</div>
+                    <div class="detail-value">${order.requirements}</div>
+                </div>
+                ` : ''}
+            `;
+            document.getElementById('orderDetailModal').classList.add('show');
+        }
+
+        // 显示进度上传modal
+        function showProgressModal(orderId) {
+            document.getElementById('progressModal').classList.add('show');
+            window.currentOrderId = orderId;
+        }
+
+        // 关闭modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            if (modalId === 'progressModal') {
+                uploadedPhotos = [];
+                document.getElementById('photoPreview').innerHTML = '';
+            }
+        }
+
+        // 处理照片上传
+        function handlePhotoUpload(event) {
+            const files = Array.from(event.target.files);
+            if (uploadedPhotos.length + files.length > 6) {
+                alert('最多只能上传6张照片');
+                return;
+            }
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedPhotos.push(e.target.result);
+                    renderPhotoPreview();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // 渲染照片预览
+        function renderPhotoPreview() {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = uploadedPhotos.map((photo, index) => `
+                <div class="image-preview-item">
+                    <img src="${photo}" alt="预览">
+                    <button class="image-remove-btn" onclick="removePhoto(${index})">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 删除照片
+        function removePhoto(index) {
+            uploadedPhotos.splice(index, 1);
+            renderPhotoPreview();
+        }
+
+        // 提交进度
+        function submitProgress() {
+            const stage = document.getElementById('progressStage').value;
+            const percent = document.getElementById('progressPercent').value;
+            const desc = document.getElementById('progressDesc').value;
+
+            if (!desc.trim()) {
+                alert('请填写进度说明');
+                return;
+            }
+
+            if (uploadedPhotos.length === 0) {
+                alert('请至少上传1张现场照片');
+                return;
+            }
+
+            alert(`✅ 进度上传成功！\n\n施工阶段: ${stage}\n完成进度: ${percent}%\n上传照片: ${uploadedPhotos.length}张\n\n参展商可以实时查看您的施工进度。`);
+            closeModal('progressModal');
+            location.reload();
+        }
+
+        // 完成订单
+        function completeOrder(orderId) {
+            if (confirm('确认提交完工？\n\n提交后参展商将进行验收，请确保所有工作已完成。')) {
+                alert(`🎉 订单 ${orderId} 已提交完工！\n\n等待参展商验收和评价。`);
+                location.reload();
+            }
+        }
+
+        // 页面加载
+        window.onload = initPage;
+
+        console.log('🏗️ 搭建商工作台加载成功');
+        console.log('📊 当前订单统计: 待处理3个, 进行中5个, 已完成28个');
+    </script>
+</body>
+</html>
