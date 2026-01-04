@@ -2986,7 +2986,7 @@
                 <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
                 <div>
                         <strong>✓ 基础信息检查通过</strong><br>
-                        <small>模板名称: <strong id="selected-template-label">简洁绿色展位</strong> | 尺寸: <strong>6m × 3m</strong></small>
+                        <small>模板名称: <strong id="selected-template-label">简洁绿色展位</strong> | 尺寸: <strong id="selected-template-size">6m × 3m</strong></small>
                 </div>
             </div>
 
@@ -3792,7 +3792,7 @@
             }
         }
 
-        function selectTemplate(element, templateId, templateName) {
+        function selectTemplate(element, templateId, templateName, templateDim) {
             // 移除其他选中状态
             document.querySelectorAll('.template-card').forEach(card => {
                 card.classList.remove('selected');
@@ -3802,7 +3802,18 @@
             element.classList.add('selected');
             selectedTemplate = templateId;
             selectedTemplateName = templateName;
+            
+            // 更新步骤1和步骤2显示的模板名称
             document.getElementById('selected-template-label').textContent = selectedTemplateName;
+            
+            // 更新步骤2显示的模板尺寸
+            if (templateDim) {
+                const sizeElement = document.getElementById('selected-template-size');
+                if (sizeElement) {
+                    sizeElement.textContent = templateDim;
+                }
+            }
+            
             // 依据模板映射选择对应方案库素材
             const map = { T001: 'A', T002: 'B', T003: 'A' };
             currentScenario = map[templateId] || 'A';
@@ -3921,7 +3932,7 @@
                 card.setAttribute('data-size', booth.size);
                 card.setAttribute('data-style', booth.style);
                 card.onclick = function() {
-                    selectTemplate(this, booth.id, booth.name);
+                    selectTemplate(this, booth.id, booth.name, booth.dim);
                     openModal(booth.id);
                 };
                 
