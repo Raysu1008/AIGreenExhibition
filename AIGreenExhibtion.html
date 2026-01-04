@@ -2995,11 +2995,11 @@
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
                         <div>
                             <label style="font-size: 12px; font-weight: normal;">长度(m)</label>
-                            <input type="number" class="form-control" value="6" step="0.1">
+                            <input type="number" id="booth-length" class="form-control" value="6" step="0.1">
                     </div>
                     <div>
                         <label style="font-size: 12px; font-weight: normal;">宽度(m)</label>
-                        <input type="number" class="form-control" value="3" step="0.1">
+                        <input type="number" id="booth-width" class="form-control" value="3" step="0.1">
                     </div>
                 </div>
             </div>
@@ -3811,6 +3811,18 @@
                 const sizeElement = document.getElementById('selected-template-size');
                 if (sizeElement) {
                     sizeElement.textContent = templateDim;
+                }
+                
+                // 解析尺寸并自动填充输入框 (如 "6m × 3m" -> length=6, width=3)
+                const dimMatch = templateDim.match(/(\d+(?:\.\d+)?)m\s*[×x]\s*(\d+(?:\.\d+)?)m/i);
+                if (dimMatch) {
+                    const length = dimMatch[1];
+                    const width = dimMatch[2];
+                    const lengthInput = document.getElementById('booth-length');
+                    const widthInput = document.getElementById('booth-width');
+                    if (lengthInput) lengthInput.value = length;
+                    if (widthInput) widthInput.value = width;
+                    console.log(`✅ 自动填充展位尺寸: 长度=${length}m, 宽度=${width}m`);
                 }
             }
             
