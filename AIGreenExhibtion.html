@@ -2704,9 +2704,9 @@
             </div>
         </div>
 
-        <!-- 第一步：选择模板 -->
+        <!-- 第一步：模板选择与AI生成 -->
         <div id="step-1-content" class="content-card">
-            <div class="section-title"><i class="bi bi-bookmark"></i> <span class="zh">步骤 1：选择展位模板</span><span class="en show">Step 1: Select Booth Template</span></div>
+            <div class="section-title"><i class="bi bi-bookmark"></i> <span class="zh">步骤 1：模板选择与AI生成</span><span class="en show">Step 1: Template Selection & AI Generation</span></div>
 
             <div class="toggle-section" onclick="toggleSection('gallery-section')">
                 <div><strong><span class="zh">方案库素材预览</span><span class="en show">Template Gallery Preview</span></strong><br><small><span class="zh">来自绿色环保方案库：现场照、施工图、品牌替换示例</span><span class="en show">From the Green Booth Library: On-site photos, construction drawings, brand replacement examples</span></small></div>
@@ -2980,7 +2980,7 @@
 
         <!-- 第二步：合规校验 -->
         <div id="step-2-content" class="content-card hidden">
-            <div class="section-title"><i class="bi bi-check-circle"></i> 步骤 2：合规校验</div>
+            <div class="section-title"><i class="bi bi-check-circle"></i> <span class="zh">步骤 2：合规校验</span><span class="en show">Step 2: Compliance Check</span></div>
             
                 <div class="compliance-alert success">
                 <div class="icon"><i class="bi bi-check-circle-fill"></i></div>
@@ -3124,7 +3124,7 @@
 
         <!-- 第三步：获取报价 -->
         <div id="step-3-content" class="content-card hidden">
-            <div class="section-title"><i class="bi bi-calculator"></i> 步骤 3：获取报价</div>
+            <div class="section-title"><i class="bi bi-calculator"></i> <span class="zh">步骤 3：获取报价</span><span class="en show">Step 3: Get Quotation</span></div>
             
             <div class="progress-bar-custom">
                 <div class="progress-fill" style="width: 100%;"></div>
@@ -3167,13 +3167,25 @@
                 </div>
             </div>
 
-            <div class="toggle-section" onclick="toggleSection('bom-image-section')">
-                <div><strong>查看样例清单图片</strong><br><small>方案一：材料清单.png；方案二：BOM.png</small></div>
-                <div class="toggle-icon" id="bom-toggle">▼</div>
+            <div class="toggle-section" onclick="toggleSection('ai-preview-images-section')">
+                <div>
+                    <strong>
+                        <span class="zh">查看AI生成效果图</span>
+                        <span class="en show">View AI Generated Renderings</span>
+                    </strong>
+                    <br>
+                    <small>
+                        <span class="zh">展示您在步骤2生成的多角度AI效果图</span>
+                        <span class="en show">Display multi-angle AI renderings generated in Step 2</span>
+                    </small>
+                </div>
+                <div class="toggle-icon" id="ai-preview-toggle">▼</div>
             </div>
-            <div id="bom-image-section" class="hidden">
-                <img id="bom-image" src="https://raw.githubusercontent.com/Raysu1008/AIGreenExhibition/main/环保展位闭环资料251217/方案一/材料清单.png" alt="样例清单" class="clickable-image" style="width:100%; border-radius:8px; border:1px solid #eee;" onclick="previewImage(this.src, '材料清单 / BOM')">
-                <p style="text-align: center; margin-top: 8px; font-size: 12px; color: #7c3aed;">💡 点击图片可放大查看详情</p>
+            <div id="ai-preview-images-section" class="hidden">
+                <!-- 检查是否已生成AI效果图 -->
+                <div id="ai-preview-check">
+                    <!-- 动态显示AI效果图或提示信息 -->
+                </div>
             </div>
 
             <div class="section-title" style="margin-top: 30px; font-size: 16px; border: none; padding: 0;">💰 费用明细</div>
@@ -3350,7 +3362,7 @@
 
         <!-- 第四步：确认下单 -->
         <div id="step-4-content" class="content-card hidden">
-            <div class="section-title"><i class="bi bi-receipt"></i> 步骤 4：确认订单</div>
+            <div class="section-title"><i class="bi bi-receipt"></i> <span class="zh">步骤 4：确认订单</span><span class="en show">Step 4: Confirm Order</span></div>
             
             <div class="order-summary">
                 <h5>📋 订单摘要</h5>
@@ -3824,6 +3836,9 @@
             
             // 动态生成45个展位卡片
             loadBoothTemplates();
+            
+            // 初始化"查看AI生成效果图"区域
+            updateAIPreviewImagesSection(null, null);
         });
         
         // 动态加载展位卡片
@@ -4245,6 +4260,49 @@
             reader.readAsDataURL(file);
         }
 
+        // 更新"查看AI生成效果图"区域的函数
+        function updateAIPreviewImagesSection(imagesToShow, imageTitles) {
+            const aiPreviewCheck = document.getElementById('ai-preview-check');
+            if (!aiPreviewCheck) return;
+            
+            if (imagesToShow && imagesToShow.length > 0) {
+                // 显示AI生成的3个效果图
+                const imagesHTML = imagesToShow.map((img, idx) => `
+                    <div style="cursor: pointer;" onclick="previewImage('${img}', '${imageTitles[idx]}')">
+                        <img src="${img}" style="width:100%; border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <p style="text-align:center; font-size:12px; margin-top:8px; color:#666;">${imageTitles[idx]}</p>
+                    </div>
+                `).join('');
+                
+                aiPreviewCheck.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 15px;">
+                        ${imagesHTML}
+                    </div>
+                    <p style="text-align:center; color:#999; font-size:12px; margin-top:10px;">
+                        <span class="zh">点击图片可放大查看</span>
+                        <span class="en show">Click to enlarge</span>
+                    </p>
+                `;
+                console.log('✅ 更新查看AI生成效果图区域');
+            } else {
+                // 显示提示信息：请先生成AI效果图
+                aiPreviewCheck.innerHTML = `
+                    <div style="text-align:center; padding:40px 20px; color:#999;">
+                        <div style="font-size:48px; margin-bottom:15px;">🎨</div>
+                        <p style="font-size:16px; margin-bottom:8px;">
+                            <span class="zh">暂无AI生成效果图</span>
+                            <span class="en show">No AI Generated Renderings Yet</span>
+                        </p>
+                        <p style="font-size:13px;">
+                            <span class="zh">请先在步骤2点击"AI生成预览"按钮</span>
+                            <span class="en show">Please click "AI Generate Preview" button in Step 2 first</span>
+                        </p>
+                    </div>
+                `;
+                console.log('ℹ️ 显示AI效果图提示信息');
+            }
+        }
+
         async function applyCustomization(event) {
             console.log('🎬 开始AI生成预览...');
             
@@ -4427,6 +4485,9 @@
                         }
                     });
                 }
+                
+                // 同时更新"查看AI生成效果图"区域（BOM清单下方）
+                updateAIPreviewImagesSection(imagesToShow, imageTitles);
                 
                 console.log('🎉 AI生成预览完成！');
                 
