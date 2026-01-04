@@ -3264,6 +3264,7 @@
         let embeddedChatOpen = false;
         let chatRightAligned = false;
         let currentLanguage = 'zh';
+        let currentGeminiImages = []; // 存储当前加载的Gemini原图URL
 
         // ============= 登录功能 =============
         // 检查是否已登录
@@ -3981,6 +3982,9 @@
                 const scenario = matchScenarioImages(prompt);
                 const imagesToShow = scenario.images;
                 const imageTitles = scenario.titles;
+                
+                // 保存到全局变量，供预览切换使用
+                currentGeminiImages = imagesToShow;
 
                 console.log('🖼️ 将显示图片数量:', imagesToShow.length);
                 console.log('🏷️ 图片标题:', imageTitles);
@@ -4142,19 +4146,26 @@
                         previewCards[index].classList.add('active');
                     }
                     
-                    // 将Canvas内容转换为图片并显示在下方
+                    // 使用原始高清Gemini图片而不是Canvas的toDataURL
                     try {
-                        const dataUrl = canvas.toDataURL('image/png');
+                        // 优先使用全局保存的Gemini图片URL（高清原图）
+                        const imageUrl = currentGeminiImages[index];
                         
-                        if (aiOutputImage && dataUrl) {
-                            aiOutputImage.src = dataUrl;
+                        if (aiOutputImage && imageUrl) {
+                            aiOutputImage.src = imageUrl;
+                            console.log('✅ 预览图片已切换到高清原图:', imageUrl);
                             
                             // 显示AI输出区域（如果还未显示）
                             if (aiOutputSection) {
                                 aiOutputSection.style.display = 'block';
                             }
-                            
-                            console.log('✅ 预览图片已切换');
+                        } else {
+                            // 降级方案：使用Canvas的toDataURL
+                            console.warn('⚠️ 未找到原图URL，使用Canvas导出（可能清晰度较低）');
+                            const dataUrl = canvas.toDataURL('image/png');
+                            if (aiOutputImage && dataUrl) {
+                                aiOutputImage.src = dataUrl;
+                            }
                         }
                     } catch (error) {
                         console.error('❌ 切换预览图片失败:', error);
@@ -4167,6 +4178,7 @@
             });
             
             console.log('✅ Canvas预览切换功能已初始化');
+            console.log('📸 已加载', currentGeminiImages.length, '张高清原图URL');
         }
         
         // 模板筛选功能
