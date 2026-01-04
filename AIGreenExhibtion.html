@@ -3374,7 +3374,7 @@
                     </div>
                     <div class="order-info-item">
                         <div class="order-info-label">展位尺寸</div>
-                        <div class="order-info-value">6m × 3m</div>
+                        <div class="order-info-value" id="order-template-size">6m × 3m</div>
                     </div>
                     <div class="order-info-item">
                         <div class="order-info-label">合规状态</div>
@@ -3804,14 +3804,21 @@
             selectedTemplate = templateId;
             selectedTemplateName = templateName;
             
-            // 更新步骤1和步骤2显示的模板名称
+            // 更新步骤1显示的模板名称
             document.getElementById('selected-template-label').textContent = selectedTemplateName;
             
-            // 更新步骤2显示的模板尺寸
+            // 更新步骤2和步骤4显示的模板尺寸
             if (templateDim) {
-                const sizeElement = document.getElementById('selected-template-size');
-                if (sizeElement) {
-                    sizeElement.textContent = templateDim;
+                // 步骤2: 基础信息检查区域
+                const step2SizeElement = document.getElementById('selected-template-size');
+                if (step2SizeElement) {
+                    step2SizeElement.textContent = templateDim;
+                }
+                
+                // 步骤4: 订单摘要区域
+                const step4SizeElement = document.getElementById('order-template-size');
+                if (step4SizeElement) {
+                    step4SizeElement.textContent = templateDim;
                 }
                 
                 // 解析尺寸并自动填充输入框 (如 "6m × 3m" -> length=6, width=3)
@@ -3823,7 +3830,8 @@
                     const widthInput = document.getElementById('booth-width');
                     if (lengthInput) lengthInput.value = length;
                     if (widthInput) widthInput.value = width;
-                    console.log(`✅ 自动填充展位尺寸: 长度=${length}m, 宽度=${width}m`);
+                    console.log(`✅ 自动填充展位尺寸 - 步骤2输入框: 长度=${length}m, 宽度=${width}m`);
+                    console.log(`✅ 自动更新展位尺寸 - 步骤4订单摘要: ${templateDim}`);
                 }
             }
             
