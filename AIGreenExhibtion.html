@@ -935,6 +935,7 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 50; /* 确保3D容器在最上层 */
         }
 
         .preview-3d-container.active {
@@ -948,6 +949,7 @@
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 51; /* 3D卡片层级 */
         }
 
         .preview-3d-face {
@@ -993,7 +995,7 @@
             transform: translateX(-50%);
             display: flex;
             gap: 15px;
-            z-index: 10;
+            z-index: 52; /* 控制按钮在卡片上方 */
         }
 
         .preview-3d-control-btn {
@@ -1034,7 +1036,7 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 10;
+            z-index: 53; /* 退出按钮在最上层 */
         }
 
         .preview-3d-exit-btn:hover {
@@ -3244,6 +3246,47 @@
                 <i class="bi bi-info-circle"></i> <strong>报价有效期：7天</strong> | 含搭建、拆卸、清运 | 可选增值服务：布景设计、灯光方案等
             </div>
 
+            <!-- AI生成效果图展示区域 -->
+            <div id="ai-generated-result-section" style="margin-top: 30px; display: none;">
+                <div class="section-title" style="font-size: 16px; border: none; padding: 0; margin-bottom: 15px;">
+                    <i class="bi bi-stars" style="color: #7c3aed;"></i> 
+                    <span class="zh">AI生成效果图（参展商选择方案）</span>
+                    <span class="en show">AI Generated Renderings (Your Selected Design)</span>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #f5f3ff 0%, #e8f5e9 100%); padding: 20px; border-radius: 12px; border: 2px solid #7c3aed;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <p style="color: #666; font-size: 13px; margin: 0;">
+                            <i class="bi bi-check-circle-fill" style="color: #27ae60;"></i> 
+                            <span class="zh">根据您选择的方案，AI已自动生成多角度效果图预览</span>
+                            <span class="en show">AI has generated multi-angle renderings based on your selected design</span>
+                        </p>
+                    </div>
+                    
+                    <!-- 3个Canvas预览 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <canvas id="preview-canvas-1" class="ai-preview-canvas clickable-image" width="400" height="300" onclick="previewImage(this.toDataURL(), 'AI效果图 - 视角1')"></canvas>
+                            <p id="canvas-title-1" style="text-align: center; margin-top: 8px; font-size: 12px; font-weight: 600; color: #7c3aed;">正面视角</p>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <canvas id="preview-canvas-2" class="ai-preview-canvas clickable-image" width="400" height="300" onclick="previewImage(this.toDataURL(), 'AI效果图 - 视角2')"></canvas>
+                            <p id="canvas-title-2" style="text-align: center; margin-top: 8px; font-size: 12px; font-weight: 600; color: #7c3aed;">左前角视角</p>
+                        </div>
+                        <div style="background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <canvas id="preview-canvas-3" class="ai-preview-canvas clickable-image" width="400" height="300" onclick="previewImage(this.toDataURL(), 'AI效果图 - 视角3')"></canvas>
+                            <p id="canvas-title-3" style="text-align: center; margin-top: 8px; font-size: 12px; font-weight: 600; color: #7c3aed;">右前角视角</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(124, 58, 237, 0.1); border-radius: 6px; font-size: 12px; color: #666; text-align: center;">
+                        <i class="bi bi-lightbulb" style="color: #f39c12;"></i> 
+                        <span class="zh">提示：点击任意图片可放大查看详情，这些效果图展示了您选择的展位方案的实际呈现效果</span>
+                        <span class="en show">Tip: Click any image to enlarge. These renderings show the actual presentation of your selected booth design</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="button-group">
                 <button class="btn-custom btn-secondary-custom" onclick="goToStep(2)">← 上一步</button>
                 <button class="btn-custom btn-primary-custom" onclick="goToStep(4)">下一步：确认下单 →</button>
@@ -4234,21 +4277,41 @@
 
                 const canvases = [frontCanvas, leftCanvas, rightCanvas];
                 console.log('🎨 Canvas元素:', canvases.map(c => c ? 'OK' : 'NULL'));
+                
+                // 同时获取步骤3的Canvas元素
+                const step3Canvases = [
+                    document.getElementById('preview-canvas-1'),
+                    document.getElementById('preview-canvas-2'),
+                    document.getElementById('preview-canvas-3')
+                ];
+                console.log('🎨 步骤3 Canvas元素:', step3Canvases.map(c => c ? 'OK' : 'NULL'));
 
-                // 在 canvas 上显示所有三张图片
+                // 在 canvas 上显示所有三张图片（同时更新步骤2和步骤3的Canvas）
                 for (let idx = 0; idx < canvases.length; idx++) {
                     const canvas = canvases[idx];
+                    const step3Canvas = step3Canvases[idx];
+                    
                     if (!canvas) {
                         console.error(`❌ Canvas ${idx} 不存在`);
                         continue;
                     }
                     
+                    // 处理步骤2的Canvas
                     const ctx = canvas.getContext('2d');
                     const w = canvas.width = canvas.clientWidth || 300;
                     const h = canvas.height = canvas.clientHeight || 200;
                     ctx.clearRect(0, 0, w, h);
                     
-                    console.log(`📐 Canvas ${idx} 尺寸: ${w}x${h}`);
+                    // 处理步骤3的Canvas
+                    let ctx3 = null, w3 = 0, h3 = 0;
+                    if (step3Canvas) {
+                        ctx3 = step3Canvas.getContext('2d');
+                        w3 = step3Canvas.width = 400; // 固定尺寸
+                        h3 = step3Canvas.height = 300;
+                        ctx3.clearRect(0, 0, w3, h3);
+                    }
+                    
+                    console.log(`📐 Canvas ${idx} 尺寸: ${w}x${h}${ctx3 ? `, 步骤3: ${w3}x${h3}` : ''}`);
 
                     // 始终显示三张图片
                     const img = new Image();
@@ -4257,7 +4320,8 @@
                     await new Promise((resolve) => {
                         img.onload = () => {
                             console.log(`✅ 图片 ${idx} 加载成功:`, imagesToShow[idx]);
-                            // 计算适配尺寸
+                            
+                            // 绘制到步骤2的Canvas
                             const scale = Math.min(w / img.width, h / img.height);
                             const dw = img.width * scale;
                             const dh = img.height * scale;
@@ -4276,11 +4340,32 @@
                             ctx.fillText(title, w/2, 25);
                             ctx.globalAlpha = 1.0;
                             
+                            // 绘制到步骤3的Canvas
+                            if (ctx3) {
+                                const scale3 = Math.min(w3 / img.width, h3 / img.height);
+                                const dw3 = img.width * scale3;
+                                const dh3 = img.height * scale3;
+                                const x3 = (w3 - dw3) / 2;
+                                const y3 = (h3 - dh3) / 2;
+                                
+                                ctx3.drawImage(img, x3, y3, dw3, dh3);
+                                
+                                // 添加标题
+                                ctx3.fillStyle = '#7c3aed';
+                                ctx3.font = 'bold 16px sans-serif';
+                                ctx3.textAlign = 'center';
+                                ctx3.globalAlpha = 0.9;
+                                ctx3.fillText(title, w3/2, 28);
+                                ctx3.globalAlpha = 1.0;
+                                
+                                console.log(`✅ 步骤3 Canvas ${idx} 绘制完成`);
+                            }
+                            
                             resolve();
                         };
                         img.onerror = (e) => {
                             console.error(`❌ 图片 ${idx} 加载失败:`, imagesToShow[idx], e);
-                            // 显示占位符
+                            // 显示占位符 - 步骤2
                             ctx.fillStyle = '#f8f9fa';
                             ctx.fillRect(0, 0, w, h);
                             ctx.fillStyle = '#7f8c8d';
@@ -4288,6 +4373,18 @@
                             ctx.textAlign = 'center';
                             ctx.fillText('图片加载失败', w/2, h/2 - 10);
                             ctx.fillText('请检查网络连接', w/2, h/2 + 10);
+                            
+                            // 显示占位符 - 步骤3
+                            if (ctx3) {
+                                ctx3.fillStyle = '#f8f9fa';
+                                ctx3.fillRect(0, 0, w3, h3);
+                                ctx3.fillStyle = '#7f8c8d';
+                                ctx3.font = '14px sans-serif';
+                                ctx3.textAlign = 'center';
+                                ctx3.fillText('图片加载失败', w3/2, h3/2 - 10);
+                                ctx3.fillText('请检查网络连接', w3/2, h3/2 + 10);
+                            }
+                            
                             resolve();
                         };
                         
@@ -4305,7 +4402,7 @@
                     const aiOutputSection = document.getElementById('ai-output-section');
                     if (aiOutputSection) {
                         aiOutputSection.style.display = 'block';
-                        console.log('✅ 显示AI输出区域');
+                        console.log('✅ 显示AI输出区域（步骤2）');
                         // 滚动到AI输出区域
                         setTimeout(() => {
                             aiOutputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -4313,6 +4410,22 @@
                     }
                 } else {
                     console.error('❌ AI输出图片元素不存在或图片列表为空');
+                }
+                
+                // 同时在步骤3的费用明细下方显示AI生成效果图
+                const aiGeneratedResultSection = document.getElementById('ai-generated-result-section');
+                if (aiGeneratedResultSection) {
+                    aiGeneratedResultSection.style.display = 'block';
+                    console.log('✅ 显示AI生成效果图区域（步骤3）');
+                    
+                    // 更新标题文字
+                    const canvasTitles = ['canvas-title-1', 'canvas-title-2', 'canvas-title-3'];
+                    imageTitles.forEach((title, idx) => {
+                        const titleEl = document.getElementById(canvasTitles[idx]);
+                        if (titleEl) {
+                            titleEl.textContent = title;
+                        }
+                    });
                 }
                 
                 console.log('🎉 AI生成预览完成！');
@@ -4766,6 +4879,7 @@
         function openModal(templateId) {
             console.log('openModal called with templateId:', templateId);
             selectedOptionals = {}; // 重置选择
+            selectedTemplate = templateId; // 保存当前展位ID（用于施工成果图上传）
             const modal = document.getElementById('detail-modal');
             console.log('Found modal element:', modal);
             
@@ -4802,6 +4916,9 @@
             
             // 填充绿色指标
             fillGreenIndicators(template.size, template.style, isEn);
+            
+            // 根据用户角色显示施工成果图部分
+            showConstructionPhotosSection(templateId);
 
             // 填充可选服务
             fillOptionalServices(isEn);
@@ -5034,6 +5151,144 @@
                     ✓ ${item.name}${item.price > 0 ? ` <span style="float: right; color: #27ae60; font-weight: 600;">+¥${formatNumber(item.price)}</span>` : ''}
                 </li>`
             ).join('');
+        }
+        
+        // ====== 实际施工成果图功能 ======
+        
+        // 存储施工成果图（使用展位ID作为key）
+        let constructionPhotos = {};
+        
+        // 根据用户角色显示施工成果图部分
+        function showConstructionPhotosSection(boothId) {
+            const exhibitorView = document.getElementById('exhibitor-view-photos');
+            const contractorView = document.getElementById('contractor-upload-photos');
+            
+            if (!currentUser) {
+                console.error('用户未登录');
+                return;
+            }
+            
+            if (currentUser.role === 'exhibitor') {
+                // 参展商角色：显示查看视图
+                exhibitorView.style.display = 'block';
+                contractorView.style.display = 'none';
+                
+                // 加载并显示该展位的施工成果图
+                loadConstructionPhotos(boothId);
+            } else if (currentUser.role === 'contractor') {
+                // 布展商角色：显示上传视图
+                exhibitorView.style.display = 'none';
+                contractorView.style.display = 'block';
+                
+                // 显示已上传的照片
+                loadUploadedPhotos(boothId);
+            }
+        }
+        
+        // 加载并显示施工成果图（参展商视图）
+        function loadConstructionPhotos(boothId) {
+            const photosGrid = document.getElementById('construction-photos-grid');
+            const noPhotosMsg = document.getElementById('no-photos-message');
+            
+            const photos = constructionPhotos[boothId] || [];
+            
+            if (photos.length === 0) {
+                photosGrid.style.display = 'none';
+                noPhotosMsg.style.display = 'block';
+            } else {
+                photosGrid.style.display = 'grid';
+                noPhotosMsg.style.display = 'none';
+                
+                photosGrid.innerHTML = photos.map((photo, index) => `
+                    <div style="position: relative; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer;" onclick="previewImage('${photo}', '施工成果图 ${index + 1}')">
+                        <img src="${photo}" alt="施工成果图 ${index + 1}" style="width: 100%; height: 180px; object-fit: cover;">
+                        <div style="padding: 8px; text-align: center; font-size: 12px; color: #666;">
+                            <i class="bi bi-camera"></i> 
+                            <span class="zh">照片 ${index + 1}</span>
+                            <span class="en show">Photo ${index + 1}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // 加载已上传的照片（布展商视图）
+        function loadUploadedPhotos(boothId) {
+            const previewContainer = document.getElementById('uploaded-photos-preview');
+            const photos = constructionPhotos[boothId] || [];
+            
+            previewContainer.innerHTML = photos.map((photo, index) => `
+                <div style="position: relative; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <img src="${photo}" alt="已上传 ${index + 1}" style="width: 100%; height: 180px; object-fit: cover;">
+                    <div style="padding: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; color: #666;">
+                            <i class="bi bi-check-circle-fill" style="color: #27ae60;"></i> 
+                            <span class="zh">照片 ${index + 1}</span>
+                            <span class="en show">Photo ${index + 1}</span>
+                        </span>
+                        <button onclick="deleteConstructionPhoto('${boothId}', ${index})" style="background: #e74c3c; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 处理照片上传
+        function handleConstructionPhotoUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            
+            // 获取当前展位ID (从openModal保存)
+            const boothId = selectedTemplate;
+            if (!boothId) {
+                alert('请先选择一个展位');
+                return;
+            }
+            
+            // 初始化照片数组
+            if (!constructionPhotos[boothId]) {
+                constructionPhotos[boothId] = [];
+            }
+            
+            // 处理每个文件
+            Array.from(files).forEach(file => {
+                // 检查文件大小（5MB限制）
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`文件 ${file.name} 超过5MB，请选择较小的图片`);
+                    return;
+                }
+                
+                // 检查文件类型
+                if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+                    alert(`文件 ${file.name} 格式不支持，请使用 JPG 或 PNG 格式`);
+                    return;
+                }
+                
+                // 读取文件并转换为base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    constructionPhotos[boothId].push(e.target.result);
+                    
+                    // 刷新显示
+                    loadUploadedPhotos(boothId);
+                    
+                    console.log(`✅ 已上传照片到展位 ${boothId}，当前共 ${constructionPhotos[boothId].length} 张`);
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // 清空input以便可以重复选择相同文件
+            event.target.value = '';
+        }
+        
+        // 删除照片
+        function deleteConstructionPhoto(boothId, index) {
+            if (confirm('确认删除这张照片吗？')) {
+                constructionPhotos[boothId].splice(index, 1);
+                loadUploadedPhotos(boothId);
+                console.log(`🗑️ 已删除展位 ${boothId} 的照片 ${index + 1}`);
+            }
         }
 
         // 监听语言切换并更新模态框内容
@@ -5767,6 +6022,66 @@
                 <div class="modal-section-title"><i class="bi bi-leaf"></i> <span class="zh">绿色环保指标</span><span class="en show">Green Indicators</span></div>
                 <div id="modal-green-indicators" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 10px;">
                     <!-- 动态生成绿色指标 -->
+                </div>
+            </div>
+
+            <!-- 实际施工成果图 -->
+            <div class="modal-section" id="modal-construction-result-section" style="background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%); padding: 15px; border-radius: 8px;">
+                <div class="modal-section-title">
+                    <i class="bi bi-camera-fill" style="color: #ff9800;"></i> 
+                    <span class="zh">实际施工成果图</span>
+                    <span class="en show">Actual Construction Photos</span>
+                </div>
+                
+                <!-- 参展商视角：查看施工成果 -->
+                <div id="exhibitor-view-photos" style="display: none; margin-top: 10px;">
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.8); border-radius: 6px; border-left: 4px solid #ff9800; margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 13px; color: #666;">
+                            <i class="bi bi-info-circle"></i> 
+                            <span class="zh">布展公司已上传施工完成后的实际照片，您可以点击查看大图</span>
+                            <span class="en show">Contractor has uploaded actual photos after construction completion. Click to view full size</span>
+                        </p>
+                    </div>
+                    <div id="construction-photos-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <!-- 动态显示施工成果图 -->
+                    </div>
+                    <div id="no-photos-message" style="text-align: center; padding: 30px; color: #999;">
+                        <i class="bi bi-image" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p style="margin-top: 10px; font-size: 13px;">
+                            <span class="zh">暂无施工成果图，请等待布展公司上传</span>
+                            <span class="en show">No construction photos yet. Waiting for contractor to upload</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 布展商视角：上传施工成果 -->
+                <div id="contractor-upload-photos" style="display: none; margin-top: 10px;">
+                    <div style="padding: 12px; background: rgba(255, 255, 255, 0.8); border-radius: 6px; border-left: 4px solid #3498db; margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 13px; color: #666;">
+                            <i class="bi bi-upload"></i> 
+                            <span class="zh">请上传展位施工完成后的实际照片（支持多张，建议3-5张不同角度）</span>
+                            <span class="en show">Please upload actual photos after booth construction (Multiple photos supported, 3-5 angles recommended)</span>
+                        </p>
+                    </div>
+                    
+                    <!-- 上传按钮 -->
+                    <div style="margin-bottom: 15px;">
+                        <input type="file" id="construction-photo-input" accept="image/*" multiple style="display: none;" onchange="handleConstructionPhotoUpload(event)">
+                        <button onclick="document.getElementById('construction-photo-input').click()" style="padding: 10px 20px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <i class="bi bi-cloud-upload"></i>
+                            <span class="zh">选择照片上传</span>
+                            <span class="en show">Select Photos to Upload</span>
+                        </button>
+                        <p style="margin-top: 8px; font-size: 12px; color: #999;">
+                            <span class="zh">支持 JPG, PNG 格式，每张图片不超过5MB</span>
+                            <span class="en show">Supports JPG, PNG formats, max 5MB per image</span>
+                        </p>
+                    </div>
+                    
+                    <!-- 已上传照片预览 -->
+                    <div id="uploaded-photos-preview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <!-- 动态显示已上传的照片 -->
+                    </div>
                 </div>
             </div>
 
